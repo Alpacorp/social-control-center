@@ -1,21 +1,13 @@
 "use client";
 
-import { useSignUp } from "./hooks/useSignUp";
+import { useLogin } from "./hooks/useLogin";
 
-export const SignUpSection = () => {
-  const { message, loading, handleInput, handleSubmit } = useSignUp();
+export const LoginSection = () => {
+  const { message, loading, handleInput, handleSubmit } = useLogin();
 
   return (
     <section>
       <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="username">Username</label>
-          <input
-            type="text"
-            id="username"
-            onChange={(event) => handleInput(event)}
-          />
-        </div>
         <div>
           <label htmlFor="email">Email</label>
           <input
@@ -38,7 +30,7 @@ export const SignUpSection = () => {
           type="submit"
           disabled={loading || message === "User created" ? true : false}
         >
-          {loading ? "Loading..." : "Sign Up"}
+          {loading ? "Loading..." : "Log In"}
         </button>
       </form>
     </section>
