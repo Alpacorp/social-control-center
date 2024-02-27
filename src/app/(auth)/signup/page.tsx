@@ -1,11 +1,7 @@
 import { SignUpSection } from "@/auth/signup/sections/SignUpSection";
 
 const signUpPage = () => {
-  return (
-    <div>
-      <SignUpSection />
-    </div>
-  );
+  return <SignUpSection />;
 };
 
 export default signUpPage;
