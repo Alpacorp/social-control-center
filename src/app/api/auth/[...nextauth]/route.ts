@@ -19,6 +19,9 @@ providers: [
 
       if (user) {
         // Any object returned will be saved in `user` property of the JWT
+
+        // You can also return a Promise that resolves to the user object
+
         return user;
       } else {
         // If you return null then an error will be displayed advising the user to check their details.
