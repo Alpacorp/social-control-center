@@ -1,4 +1,3 @@
-import { signIn } from "next-auth/react";
 import { useState } from "react";
 
 export const useLogin = () => {
@@ -21,20 +20,38 @@ export const useLogin = () => {
 
     try {
       setLoading(true);
-      const res = await signIn("credentials", {
-        redirect: false,
-        email: info.email,
-        password: info.password,
+      const response = await fetch("/api/login/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: info.email,
+          password: info.password,
+        }),
       });
 
-      if (res?.error) {
-        console.error("Failed to sign in:", res?.error);
+      console.log("response login", response);
+
+      if (response.ok) {
+        const data = await response.json(); // Asegúrate de que la respuesta no esté vacía
+        console.log("Login successful", data);
         setLoading(false);
-        setMessage("Failed to sign in");
-        return;
+        setMessage("Login successful");
+        // Aquí puedes hacer algo con el token recibido, como almacenarlo localmente
+      } else {
+        // Si la respuesta no es ok, aún intenta leer el cuerpo para mostrar el mensaje de error
+        const errorData = await response.text(); // Usa text() en caso de que no haya un JSON válido
+        try {
+          const jsonError = JSON.parse(errorData); // Intenta analizar el texto a JSON
+          setMessage(jsonError.message || "Failed to log in");
+        } catch {
+          setMessage("Failed to log in"); // Maneja el caso de que el cuerpo no sea un JSON válido
+        }
+        setLoading(false);
       }
     } catch (error) {
-      console.error("POST /api/auth/signup failed:", error);
+      console.error("POST /api/auth/login failed:", error);
       setLoading(false);
       setMessage("Internal server error");
     }
