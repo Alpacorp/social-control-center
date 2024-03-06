@@ -20,7 +20,7 @@ export const useLogin = () => {
 
     try {
       setLoading(true);
-      const response = await fetch("/api/login/", {
+      const response = await fetch("/api/auth/login/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -39,6 +39,9 @@ export const useLogin = () => {
         setLoading(false);
         setMessage("Login successful");
         // Aquí puedes hacer algo con el token recibido, como almacenarlo localmente
+        sessionStorage.setItem("token", data.token);
+        // save token into cookie
+        document.cookie = `token=${data.token}; path=/;`;
       } else {
         // Si la respuesta no es ok, aún intenta leer el cuerpo para mostrar el mensaje de error
         const errorData = await response.text(); // Usa text() en caso de que no haya un JSON válido
@@ -51,7 +54,7 @@ export const useLogin = () => {
         setLoading(false);
       }
     } catch (error) {
-      console.error("POST /api/auth/login failed:", error);
+      console.error("POST /api/auth/route failed:", error);
       setLoading(false);
       setMessage("Internal server error");
     }
