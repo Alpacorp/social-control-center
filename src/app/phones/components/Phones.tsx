@@ -16,7 +16,6 @@ export const Phones = () => {
     try {
       const response = await fetch("/api/phones/");
       const data = await response.json();
-      console.log("data", data);
       setProducts(data.phones);
     } catch (error) {
       console.error("GET /api/phones/ failed:", error);
