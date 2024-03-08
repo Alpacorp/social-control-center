@@ -9,7 +9,6 @@ export async function GET() {
 
   try {
     const phones = await Phone.find({});
-    console.log("phones", phones);
     return NextResponse.json({ phones }, { status: 200 });
   } catch (error) {
     console.error("GET /api/phones/ failed:", error);
