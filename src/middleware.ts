@@ -1,15 +1,23 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { jwtVerify } from "jose";
 
 export default async function middleware(request: NextRequest) {
-  const currentUser = request.cookies.get("token")?.value;
-  const jwtSecret = process.env.NEXT_PUBLIC_JWT_SECRET ?? "";
+  const token = request.cookies.get("token")?.value || "";
 
-  if (currentUser === undefined) {
+  const response = await fetch(`${request.nextUrl.origin}/api/token/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ token }),
+  });
+
+  const result = await response.json();
+
+  if (!result.valid) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
+
+  return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/test"],
+  matcher: ["/", "/test", "/signup"],
 };
