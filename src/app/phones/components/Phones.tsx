@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
+import { VirtualScrollerLazyEvent } from "primereact/virtualscroller";
 
 interface Product {
   _id: string;
@@ -12,6 +13,7 @@ interface Product {
 
 export const Phones = () => {
   const [products, setProducts] = useState<Product[]>([]);
+
   const handleFetch = async () => {
     try {
       const response = await fetch("/api/phones/");
@@ -26,6 +28,10 @@ export const Phones = () => {
     handleFetch();
   }, []);
 
+  function loadCarsLazy(event: VirtualScrollerLazyEvent): void {
+    throw new Error("Function not implemented.");
+  }
+
   return (
     <div className="card">
       <DataTable
@@ -36,6 +42,12 @@ export const Phones = () => {
         paginator
         rows={5}
         rowsPerPageOptions={[5, 10, 25, 50]}
+        loading={products.length === 0}
+        virtualScrollerOptions={{
+          lazy: true,
+          onLazyLoad: loadCarsLazy,
+          itemSize: 50,
+        }}
       >
         <Column
           field="_id"
