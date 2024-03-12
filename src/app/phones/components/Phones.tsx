@@ -3,6 +3,9 @@ import { useEffect, useState } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { VirtualScrollerLazyEvent } from "primereact/virtualscroller";
+import { InputNumber } from "primereact/inputnumber";
+import { InputText } from "primereact/inputtext";
+import { Nullable } from "primereact/ts-helpers";
 
 interface Product {
   _id: string;
@@ -32,6 +35,62 @@ export const Phones = () => {
     throw new Error("Function not implemented.");
   }
 
+  const allowEdit = (rowData: { name: string }) => {
+    return rowData.name !== "Blue Band";
+  };
+
+  const onRowEditComplete = async (event: { newData: any; index: any }) => {
+    let { newData, index } = event;
+    let _products = [...products];
+    _products[index] = newData;
+    setProducts(_products);
+
+    console.log("newData:", newData);
+
+    try {
+      const response = await fetch(`/api/phones/${newData._id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newData),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to update the phone record");
+      }
+      const updatedPhone = await response.json();
+      console.log("Updated phone:", updatedPhone);
+    } catch (error) {
+      console.error("Failed to update the phone record:", error);
+    }
+  };
+
+  const numberEditor = (options: {
+    value: number | null | undefined;
+    editorCallback: (arg0: Nullable<number | null>) => void;
+  }) => {
+    return (
+      <InputNumber
+        value={options.value}
+        onValueChange={(e) => options.editorCallback(e.value)}
+        useGrouping={false}
+      />
+    );
+  };
+
+  const textEditor = (options: {
+    value: string | undefined;
+    editorCallback: (arg0: string) => void | undefined;
+  }) => {
+    return (
+      <InputText
+        type="text"
+        value={options.value}
+        onChange={(e) => options.editorCallback(e.target.value)}
+      />
+    );
+  };
+
   return (
     <div className="card">
       <DataTable
@@ -48,6 +107,7 @@ export const Phones = () => {
           onLazyLoad: loadCarsLazy,
           itemSize: 50,
         }}
+        onRowEditComplete={onRowEditComplete}
       >
         <Column
           field="_id"
@@ -56,22 +116,30 @@ export const Phones = () => {
           style={{ width: "20%" }}
         ></Column>
         <Column
+          editor={(options) => numberEditor(options as any)}
           field="number"
           header="Number"
           sortable
           style={{ width: "20%" }}
         ></Column>
         <Column
+          editor={(options) => textEditor(options as any)}
           field="operator"
           header="Operator"
           sortable
           style={{ width: "20%" }}
         ></Column>
         <Column
+          editor={(options) => textEditor(options as any)}
           field="comment"
           header="Comment"
           sortable
           style={{ width: "20%" }}
+        ></Column>
+        <Column
+          rowEditor={allowEdit}
+          headerStyle={{ width: "10%", minWidth: "8rem" }}
+          bodyStyle={{ textAlign: "center" }}
         ></Column>
       </DataTable>
     </div>
