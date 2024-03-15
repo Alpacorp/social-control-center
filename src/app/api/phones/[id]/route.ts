@@ -2,13 +2,19 @@ import Phone from "@/models/phoneModel";
 import { connectDB } from "@/utils/connect";
 import { NextResponse } from "next/server";
 
-export async function PATCH({ params, body }: { params: any; body: any }) {
+export async function PATCH(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
   await connectDB();
-
   try {
-    const phone = await Phone.findByIdAndUpdate(params.id, body, {
-      new: true,
-    });
+    const phone = await Phone.findByIdAndUpdate(
+      params.id,
+      JSON.parse(await request.text()),
+      {
+        new: true,
+      }
+    );
     return NextResponse.json(phone, { status: 200 });
   } catch (error) {
     console.error("Failed to update the phone record:", error);
