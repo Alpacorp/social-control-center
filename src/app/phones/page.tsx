@@ -1,13 +1,9 @@
 "use client";
 
-import { Phones } from "./components/Phones";
+import { Phones } from "./container/sections/Phones";
 
 const phonesPage = () => {
-  return (
-    <div>
-      <Phones />
-    </div>
-  );
+  return <Phones />;
 };
 
 export default phonesPage;
