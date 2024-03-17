@@ -20,10 +20,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <PrimeReactProvider>
-        <body className={inter.className}>{children}</body>
-      </PrimeReactProvider>
-    </html>
+    <PrimeReactProvider>
+      <html lang="en">
+        <body>{children}</body>
+      </html>
+    </PrimeReactProvider>
   );
 }
