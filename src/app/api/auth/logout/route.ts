@@ -13,7 +13,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ message: "Logged out" }, { status: 200 });
   } catch (error) {
     console.error("POST /api/auth/logout failed:", error);
-
     return NextResponse.json({ message: "Invalid token" }, { status: 500 });
   }
 }
