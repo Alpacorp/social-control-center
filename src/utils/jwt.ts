@@ -1,11 +1,11 @@
 import jwt from "jsonwebtoken";
 
-const generateJWT = (uid, name, role, area) => {
+const generateJWT = (uid: any, name: any, role: any, area: any) => {
   return new Promise((resolve, reject) => {
     const payload = { uid, name, role, area };
     jwt.sign(
       payload,
-      process.env.NEXT_PUBLIC_JWT_SECRET,
+      process.env.NEXT_PUBLIC_JWT_SECRET || "",
       {
         expiresIn: "2h",
       },

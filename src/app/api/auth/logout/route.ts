@@ -1,7 +1,7 @@
 import { Secret, verify } from "jsonwebtoken";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(req: NextResponse) {
+export async function POST(req: NextRequest) {
   const token = req.cookies.get("token")?.value;
 
   if (!token) {
@@ -13,7 +13,6 @@ export async function POST(req: NextResponse) {
     return NextResponse.json({ message: "Logged out" }, { status: 200 });
   } catch (error) {
     console.error("POST /api/auth/logout failed:", error);
-
     return NextResponse.json({ message: "Invalid token" }, { status: 500 });
   }
 }
