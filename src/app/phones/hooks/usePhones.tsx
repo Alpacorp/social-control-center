@@ -78,14 +78,11 @@ export const usePhones = () => {
     handleFetch();
   }, []);
 
-  useEffect(() => {
-    console.log("phones:", phones);
-  }, [phones]);
-
   return {
     phones,
     setPhones,
     allowEdit,
+    handleFetch,
     onRowEditComplete,
     numberEditor,
     textEditor,

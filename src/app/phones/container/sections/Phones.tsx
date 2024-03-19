@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
@@ -8,12 +8,25 @@ import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
 
 import { usePhones } from "@/phones/hooks/usePhones";
+import { Tag } from "primereact/tag";
 
 export interface RowsData {
   _id: string;
   number: string;
   operator: string;
   comment: string;
+}
+
+export interface Status {
+  show: boolean;
+  value: string;
+  notification: string;
+  res: "ok" | "error";
+}
+
+export interface Copied {
+  success: boolean;
+  value: string;
 }
 
 export const Phones = () => {
@@ -24,6 +37,7 @@ export const Phones = () => {
     numberEditor,
     textEditor,
     setPhones,
+    handleFetch,
   } = usePhones();
 
   const [phone, setPhone] = useState();
@@ -31,7 +45,17 @@ export const Phones = () => {
   const [comment, setComment] = useState("");
   const [selectedPhone, setSelectedPhone] = useState(null);
 
-  console.log("selectedPhone:", selectedPhone);
+  const [copied, setCopied] = useState<Copied>({
+    success: false,
+    value: "",
+  });
+
+  const [status, setStatus] = useState<Status>({
+    show: false,
+    value: "",
+    notification: "",
+    res: "ok",
+  });
 
   const operators = [
     { value: "Claro", label: "Claro" },
@@ -67,14 +91,25 @@ export const Phones = () => {
         return response.json();
       })
       .then((phone) => {
-        console.log("Created phone:", phone);
         setPhones([...phones, phone]);
+        setStatus({
+          show: true,
+          value: `Número ${phone.number} Registrado exitosamente!`,
+          notification: "insert",
+          res: "ok",
+        });
       })
       .catch((error) => {
-        console.error("Failed to create the phone record:", error);
+        setStatus({
+          show: true,
+          value: `Registro fallido! Error: ${error.message}`,
+          notification: "insert",
+          res: "error",
+        });
       });
 
     handleEmptyForm();
+    handleFetch();
   };
 
   const handleEmptyForm = () => {
@@ -85,10 +120,29 @@ export const Phones = () => {
 
   const handleChangeOperator = (e: any) => {
     setOperator(e.value);
-    console.log("operator:", e.value);
+  };
+
+  const showAlertDelete = (rows: RowsData[]) => {
+    const complementaryText = `${rows.length} ${
+      rows.length > 1 ? "registros" : "registro"
+    }`;
+
+    const confirm = prompt(
+      `¿Estás seguro de eliminar ${complementaryText}. Escriba "borr4r ${complementaryText}" para confirmar.`
+    );
+    if (confirm === `borr4r ${complementaryText}`) {
+      return true;
+    } else {
+      alert("Eliminación cancelada");
+      return false;
+    }
   };
 
   const handleDeleteSelected = (rows: RowsData[]) => {
+    if (!showAlertDelete(rows)) {
+      return;
+    }
+
     const deletePromises = rows.map((row) =>
       fetch(`/api/phones/${row._id}`, {
         method: "DELETE",
@@ -104,12 +158,71 @@ export const Phones = () => {
         return Promise.all(responses.map((response) => response.json()));
       })
       .then((phones) => {
-        console.log("Deleted phones:", phones);
+        alert(
+          `Eliminación exitosa de ${phones.length} ${
+            phones.length > 1 ? "registros" : "registro"
+          }!`
+        );
+        setSelectedPhone(null);
       })
       .catch((error) => {
-        console.error("Failed to delete phone records:", error);
+        alert(`Eliminación fallida! Error: ${error.message}`);
       });
+    handleFetch();
   };
+
+  const numberBodyTemplate = (rowData: RowsData) => {
+    return (
+      <div>
+        <button
+          style={{
+            cursor: "pointer",
+            background: "none",
+            border: "none",
+            fontSize: "1rem",
+          }}
+          onClick={(e) => {
+            navigator.clipboard.writeText(rowData.number);
+            setCopied({ success: true, value: rowData.number });
+            setTimeout(() => {
+              setCopied({ success: false, value: "" });
+            }, 3000);
+          }}
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              navigator.clipboard.writeText(rowData.number);
+              setCopied({ success: true, value: rowData.number });
+              setTimeout(() => {
+                setCopied({ success: false, value: "" });
+              }, 3000);
+            }
+          }}
+        >
+          {rowData.number}
+        </button>
+        {copied.success && copied.value === rowData.number && (
+          <Tag
+            value="Copiado!"
+            severity="success"
+            style={{ marginLeft: "1rem", height: "1rem" }}
+          />
+        )}
+      </div>
+    );
+  };
+
+  const closestatus = useCallback(() => {
+    if (status.show) {
+      setTimeout(() => {
+        setStatus({ show: false, value: "", notification: "", res: "ok" });
+      }, 5000);
+    }
+  }, [status]);
+
+  useEffect(() => {
+    closestatus();
+  }, [closestatus]);
 
   return (
     <section
@@ -121,6 +234,7 @@ export const Phones = () => {
         onSubmit={handleSubmitPhone}
         style={{
           display: "flex",
+          flexWrap: "wrap",
           gap: "1rem",
           margin: "2rem 0 4rem 0",
         }}
@@ -163,14 +277,44 @@ export const Phones = () => {
           disabled={phone === 0 || !phone}
           className="mt-4"
         />
+        {status.show && status.notification === "insert" && (
+          <Tag
+            value={status ? status.value : ""}
+            severity={status.res === "ok" ? "success" : "danger"}
+            style={{ marginLeft: "1rem" }}
+            icon={status.res === "ok" ? "pi pi-check" : "pi pi-times"}
+          />
+        )}
       </form>
-      <Button
-        label="Delete"
-        icon="pi pi-trash"
-        severity="danger"
-        onClick={() => handleDeleteSelected(selectedPhone as any)}
-        disabled={!selectedPhone}
-      />
+      <div style={{ height: "39px", marginBottom: "20px" }}>
+        {selectedPhone && selectedPhone[0] && (
+          <>
+            <Button
+              label="Delete"
+              icon="pi pi-trash"
+              severity="danger"
+              onClick={() => handleDeleteSelected(selectedPhone as any)}
+              disabled={!selectedPhone}
+            />
+
+            {status.show && status.notification === "delete" && (
+              <Tag
+                value={status ? status.value : ""}
+                severity={
+                  status.value.includes("exitoso") ? "success" : "danger"
+                }
+                style={{ marginLeft: "1rem" }}
+                icon={
+                  status.value.includes("exitoso")
+                    ? "pi pi-check"
+                    : "pi pi-times"
+                }
+              />
+            )}
+          </>
+        )}
+      </div>
+
       <DataTable
         value={phones}
         tableStyle={{ minWidth: "50rem" }}
@@ -178,25 +322,24 @@ export const Phones = () => {
         dataKey="_id"
         paginator
         rows={5}
-        rowsPerPageOptions={[5, 10, 25, 50]}
-        // loading={
-        //   !phones ||
-        //   (phones && phones.length === 0) ||
-        //   phones === undefined ||
-        //   phones === null
-        // }
+        rowsPerPageOptions={[5, 10, 25, 50, 100, 200]}
         onRowEditComplete={onRowEditComplete}
         resizableColumns
         showGridlines
         removableSort
         reorderableColumns
         selection={selectedPhone}
-        onSelectionChange={(e) => setSelectedPhone(e.value as any)}
+        selectionMode={"checkbox" as any}
+        onSelectionChange={(event: any) => setSelectedPhone(event.value)}
       >
-        <Column selectionMode="multiple" exportable={false}></Column>
+        <Column
+          selectionMode="multiple"
+          headerStyle={{ width: "10%" }}
+          exportable={false}
+        ></Column>
         <Column
           field="_id"
-          header="_id"
+          header="Identificador"
           sortable
           sortField="_id"
           showFilterOperator
@@ -205,21 +348,22 @@ export const Phones = () => {
         <Column
           editor={(options) => numberEditor(options as any)}
           field="number"
-          header="Number"
+          header="Número"
           sortable
           style={{ width: "20%" }}
+          body={numberBodyTemplate}
         ></Column>
         <Column
           editor={(options) => textEditor(options as any)}
           field="operator"
-          header="Operator"
+          header="Operador"
           sortable
           style={{ width: "20%" }}
         ></Column>
         <Column
           editor={(options) => textEditor(options as any)}
           field="comment"
-          header="Comment"
+          header="Comentarios adicionales"
           sortable
           style={{ width: "20%" }}
         ></Column>
@@ -227,6 +371,8 @@ export const Phones = () => {
           rowEditor={allowEdit}
           headerStyle={{ width: "10%", minWidth: "8rem" }}
           bodyStyle={{ textAlign: "center" }}
+          field="action"
+          header="Acciones"
         ></Column>
       </DataTable>
     </section>
