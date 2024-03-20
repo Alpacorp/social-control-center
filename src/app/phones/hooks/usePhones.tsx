@@ -1,90 +1,72 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
-import { InputNumber } from "primereact/inputnumber";
-import { InputText } from "primereact/inputtext";
-import { Nullable } from "primereact/ts-helpers";
-import { Product } from "@/phones/interfaces/phones";
+import { Tag } from "primereact/tag";
+
+import { Copied, RowsData } from "@/phones/interfaces/phones";
 
 export const usePhones = () => {
-  const [phones, setPhones] = useState<Product[]>([]);
-
-  const handleFetch = async () => {
-    try {
-      const response = await fetch("/api/phones/");
-      const data = await response.json();
-      setPhones(data.phones);
-    } catch (error) {
-      console.error("GET /api/phones/ failed:", error);
-    }
-  };
+  const [phone, setPhone] = useState();
+  const [operator, setOperator] = useState(null);
+  const [copied, setCopied] = useState<Copied>({
+    success: false,
+    value: "",
+  });
 
   const allowEdit = (rowData: { name: string }) => {
     return rowData.name !== "Blue Band";
   };
 
-  const onRowEditComplete = async (event: { newData: any; index: any }) => {
-    let { newData, index } = event;
-    let _products = [...phones];
-    _products[index] = newData;
-    setPhones(_products);
-
-    console.log("newData:", newData);
-
-    try {
-      const response = await fetch(`/api/phones/${newData._id}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newData),
-      });
-      if (!response.ok) {
-        throw new Error("Failed to update the phone record");
-      }
-      const updatedPhone = await response.json();
-      console.log("Updated phone:", updatedPhone);
-    } catch (error) {
-      console.error("Failed to update the phone record:", error);
-    }
+  const handleChangeOperator = (e: any) => {
+    setOperator(e.value);
   };
 
-  const numberEditor = (options: {
-    value: number | null | undefined;
-    editorCallback: (arg0: Nullable<number | null>) => void;
-  }) => {
+  const numberBodyTemplate = (rowData: RowsData) => {
     return (
-      <InputNumber
-        value={options.value}
-        onValueChange={(e) => options.editorCallback(e.value)}
-        useGrouping={false}
-      />
+      <div>
+        <button
+          style={{
+            cursor: "pointer",
+            background: "none",
+            border: "none",
+            fontSize: "1rem",
+          }}
+          onClick={(e) => {
+            navigator.clipboard.writeText(rowData.number);
+            setCopied({ success: true, value: rowData.number });
+            setTimeout(() => {
+              setCopied({ success: false, value: "" });
+            }, 3000);
+          }}
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              navigator.clipboard.writeText(rowData.number);
+              setCopied({ success: true, value: rowData.number });
+              setTimeout(() => {
+                setCopied({ success: false, value: "" });
+              }, 3000);
+            }
+          }}
+        >
+          {rowData.number}
+        </button>
+        {copied.success && copied.value === rowData.number && (
+          <Tag
+            value="Copiado!"
+            severity="success"
+            style={{ marginLeft: "1rem", height: "1rem" }}
+          />
+        )}
+      </div>
     );
   };
-
-  const textEditor = (options: {
-    value: string | undefined;
-    editorCallback: (arg0: string) => void | undefined;
-  }) => {
-    return (
-      <InputText
-        type="text"
-        value={options.value}
-        onChange={(e) => options.editorCallback(e.target.value)}
-      />
-    );
-  };
-
-  useEffect(() => {
-    handleFetch();
-  }, []);
 
   return {
-    phones,
-    setPhones,
     allowEdit,
-    handleFetch,
-    onRowEditComplete,
-    numberEditor,
-    textEditor,
+    handleChangeOperator,
+    numberBodyTemplate,
+    operator,
+    phone,
+    setPhone,
   };
 };
