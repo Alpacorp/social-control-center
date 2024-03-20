@@ -1,6 +1,6 @@
 "use client";
 
-import { Phones } from "./container/sections/Phones";
+import { Phones } from "@/phones/container/Phones";
 
 const phonesPage = () => {
   return <Phones />;

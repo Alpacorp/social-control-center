@@ -10,26 +10,27 @@ import { NumberEditor } from "@/app/shared/ui/components/NumberEditor";
 import { TextEditor } from "@/app/shared/ui/components/TextEditor";
 
 import { usePhones } from "@/phones/hooks/usePhones";
-import { useServices } from "@/phones/hooks/useServices";
 
 import operators from "@/phones/data/operators.json";
 
 export const Phones = () => {
-  const { allowEdit, handleChangeOperator, numberBodyTemplate } = usePhones();
   const {
+    allowEdit,
     comment,
     handleDeleteSelected,
     handleSubmitPhone,
-    onRowEditComplete,
+    numberBodyTemplate,
     operator,
+    onRowEditComplete,
     phone,
     phones,
     selectedPhone,
     setComment,
     setPhone,
     setSelectedPhone,
+    handleChangeOperator,
     status,
-  } = useServices();
+  } = usePhones();
 
   return (
     <section
