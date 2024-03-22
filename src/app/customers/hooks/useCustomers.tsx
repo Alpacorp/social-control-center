@@ -1,14 +1,19 @@
 import { useCallback, useEffect, useState } from "react";
 
-import { Copied, Phone, RowsData, Status } from "@/phones/interfaces/phones";
 import { Tag } from "primereact/tag";
+import {
+  Copied,
+  Customer,
+  RowsData,
+  Status,
+} from "@/customers/interfaces/customers";
 
-export const usePhones = () => {
-  const [phones, setPhones] = useState<Phone[]>([]);
-  const [phone, setPhone] = useState();
-  const [operator, setOperator] = useState(null);
+export const useCustomers = () => {
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [customer, setCustomer] = useState();
+  const [name, setName] = useState();
   const [comment, setComment] = useState("");
-  const [selectedPhone, setSelectedPhone] = useState(null);
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [status, setStatus] = useState<Status>({
     show: false,
     value: "",
@@ -24,31 +29,27 @@ export const usePhones = () => {
     return rowData.name !== "Blue Band";
   };
 
-  const handleGetPhones = async () => {
+  const handleGetCustomers = async () => {
     try {
-      const response = await fetch("/api/phones/");
+      const response = await fetch("/api/customers/");
       const data = await response.json();
-      setPhones(data.phones);
+      setCustomers(data.customers);
     } catch (error) {
-      console.error("GET /api/phones/ failed:", error);
+      console.error("GET /api/customers/ failed:", error);
     }
   };
 
-  const handleChangeOperator = (event: {
-    value: any;
-    target: { value: any };
-  }) => {
-    setOperator(event.value);
-  };
-
-  const onRowEditComplete = async (event: { newData: any; index: any }) => {
+  const onRowEditComplete = async (event: {
+    newData: any;
+    index: any;
+  }): Promise<void> => {
     let { newData, index } = event;
-    let _phones = [...phones];
-    _phones[index] = newData;
-    setPhones(_phones);
+    let _customers = [...customers];
+    _customers[index] = newData;
+    setCustomers(_customers);
 
     try {
-      const response = await fetch(`/api/phones/${newData._id}`, {
+      const response = await fetch(`/api/customers/${newData._id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -56,39 +57,38 @@ export const usePhones = () => {
         body: JSON.stringify(newData),
       });
       if (!response.ok) {
-        throw new Error("Failed to update the phone record");
+        throw new Error("Failed to update the customer record");
       }
       await response.json();
     } catch (error) {
-      console.error("Failed to update the phone record:", error);
+      console.error("Failed to update the customer record:", error);
     }
   };
 
-  const handleSubmitPhone = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSubmitCustomer = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
 
-    fetch("/api/phones/", {
+    fetch("/api/customers/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        number: phone,
-        operator,
+        name: name,
         comment,
       }),
     })
       .then((response) => {
         if (!response.ok) {
-          throw new Error("Failed to create the phone record");
+          throw new Error("Failed to create the customer record");
         }
         return response.json();
       })
-      .then((phone) => {
-        setPhones([...phones, phone]);
+      .then((customer) => {
+        setCustomers([...customer, customer]);
         setStatus({
           show: true,
-          value: `Número ${phone.number} Registrado exitosamente!`,
+          value: `Cliente ${customer.name} Registrado exitosamente!`,
           notification: "insert",
           res: "ok",
         });
@@ -103,7 +103,7 @@ export const usePhones = () => {
       });
 
     handleEmptyForm();
-    handleGetPhones();
+    handleGetCustomers();
   };
 
   const handleDeleteSelected = (rows: RowsData[]) => {
@@ -112,7 +112,7 @@ export const usePhones = () => {
     }
 
     const deletePromises = rows.map((row) =>
-      fetch(`/api/phones/${row._id}`, {
+      fetch(`/api/customers/${row._id}`, {
         method: "DELETE",
       })
     );
@@ -121,22 +121,22 @@ export const usePhones = () => {
       .then((responses) => {
         const allSuccessful = responses.every((response) => response.ok);
         if (!allSuccessful) {
-          throw new Error("Failed to delete some phone records");
+          throw new Error("Failed to delete some customer records");
         }
         return Promise.all(responses.map((response) => response.json()));
       })
-      .then((phones) => {
+      .then((customers) => {
         alert(
-          `Eliminación exitosa de ${phones.length} ${
-            phones.length > 1 ? "registros" : "registro"
+          `Eliminación exitosa de ${customers.length} ${
+            customers.length > 1 ? "registros" : "registro"
           }!`
         );
-        setSelectedPhone(null);
+        setSelectedCustomer(null);
       })
       .catch((error) => {
         alert(`Eliminación fallida! Error: ${error.message}`);
       });
-    handleGetPhones();
+    handleGetCustomers();
   };
 
   const showAlertDelete = (rows: RowsData[]) => {
@@ -156,8 +156,7 @@ export const usePhones = () => {
   };
 
   const handleEmptyForm = () => {
-    setPhone("" as any);
-    setOperator(null);
+    setCustomer("" as any);
     setComment("");
   };
 
@@ -215,28 +214,25 @@ export const usePhones = () => {
   }, [closestatus]);
 
   useEffect(() => {
-    handleGetPhones();
+    handleGetCustomers();
   }, []);
 
   return {
     allowEdit,
     closestatus,
     comment,
-    handleChangeOperator,
     handleDeleteSelected,
     handleEmptyForm,
-    handleGetPhones,
-    handleSubmitPhone,
+    handleGetCustomers,
+    handleSubmitCustomer,
     numberBodyTemplate,
     onRowEditComplete,
-    operator,
-    phone,
-    phones,
-    selectedPhone,
+    customer,
+    customers,
+    selectedCustomer,
     setComment,
-    setOperator,
-    setPhone,
-    setSelectedPhone,
+    setCustomer,
+    setSelectedCustomer,
     showAlertDelete,
     status,
   };
