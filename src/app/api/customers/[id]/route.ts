@@ -25,7 +25,10 @@ export async function PATCH(
   }
 }
 
-export async function DELETE({ params }: { params: { id: string } }) {
+export async function DELETE(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
   await connectDB();
 
   try {
