@@ -1,7 +1,6 @@
-export interface Phone {
+export interface Customer {
   _id: string;
-  number: string;
-  operator: string;
+  name: string;
   comment: string;
 }
 
