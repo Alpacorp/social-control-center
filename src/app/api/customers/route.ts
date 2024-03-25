@@ -19,6 +19,8 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  console.log("request", request);
+
   await connectDB();
 
   try {

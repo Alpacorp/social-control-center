@@ -86,6 +86,8 @@ export const usePhones = () => {
       })
       .then((phone) => {
         setPhones([...phones, phone]);
+        handleEmptyForm();
+        handleGetPhones();
         setStatus({
           show: true,
           value: `Número ${phone.number} Registrado exitosamente!`,
@@ -101,9 +103,6 @@ export const usePhones = () => {
           res: "error",
         });
       });
-
-    handleEmptyForm();
-    handleGetPhones();
   };
 
   const handleDeleteSelected = (rows: RowsData[]) => {
