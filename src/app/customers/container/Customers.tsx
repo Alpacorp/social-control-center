@@ -44,14 +44,13 @@ export const Customers = () => {
       >
         <div>
           <span className="p-float-label">
-            <InputNumber
-              id="number-input"
+            <InputText
+              id="customer"
               value={customer}
-              onValueChange={(e) => setCustomer(e.value as any)}
-              useGrouping={false}
+              onChange={(e) => setCustomer(e.target.value as any)}
               required
             />
-            <label htmlFor="number-input">Number</label>
+            <label htmlFor="customer">Number</label>
           </span>
         </div>
         <span className="p-float-label">
@@ -65,7 +64,7 @@ export const Customers = () => {
         <Button
           label="Registrar"
           raised
-          disabled={customer === 0 || !customer}
+          disabled={!customer}
           className="mt-4"
         />
         {status.show && status.notification === "insert" && (
@@ -131,24 +130,29 @@ export const Customers = () => {
           style={{ width: "20%" }}
         ></Column>
         <Column
-          editor={(options) => NumberEditor(options as any)}
-          field="number"
-          header="Número"
+          editor={(options) => TextEditor(options as any)}
+          field="customer"
+          header="Nombre Cliente"
           sortable
           style={{ width: "20%" }}
           body={numberBodyTemplate}
         ></Column>
         <Column
           editor={(options) => TextEditor(options as any)}
-          field="operator"
-          header="Operador"
+          field="comment"
+          header="Comentarios adicionales"
           sortable
           style={{ width: "20%" }}
         ></Column>
         <Column
-          editor={(options) => TextEditor(options as any)}
-          field="comment"
-          header="Comentarios adicionales"
+          field="updatedAt"
+          header="Última actualización"
+          sortable
+          style={{ width: "20%" }}
+        ></Column>
+        <Column
+          field="createdAt"
+          header="Fecha registro"
           sortable
           style={{ width: "20%" }}
         ></Column>

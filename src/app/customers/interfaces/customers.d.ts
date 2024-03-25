@@ -1,13 +1,12 @@
 export interface Customer {
   _id: string;
-  name: string;
+  customer: string;
   comment: string;
 }
 
 export interface RowsData {
   _id: string;
-  number: string;
-  operator: string;
+  customer: string;
   comment: string;
 }
 

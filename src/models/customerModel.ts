@@ -2,9 +2,9 @@ import mongoose from "mongoose";
 
 const customerSchema = new mongoose.Schema(
   {
-    name: {
+    customer: {
       type: String,
-      required: [true, "Name is required"],
+      required: [true, "Customer is required"],
     },
     comment: {
       type: String,

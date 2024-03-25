@@ -10,9 +10,12 @@ import {
 
 export const useCustomers = () => {
   const [customers, setCustomers] = useState<Customer[]>([]);
-  const [customer, setCustomer] = useState();
-  const [name, setName] = useState();
+  const [customer, setCustomer] = useState("");
   const [comment, setComment] = useState("");
+
+  console.log("customer", customer);
+  console.log("comment:", comment);
+
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [status, setStatus] = useState<Status>({
     show: false,
@@ -20,6 +23,9 @@ export const useCustomers = () => {
     notification: "",
     res: "ok",
   });
+
+  console.log("status", status);
+
   const [copied, setCopied] = useState<Copied>({
     success: false,
     value: "",
@@ -74,7 +80,7 @@ export const useCustomers = () => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        name: name,
+        customer,
         comment,
       }),
     })
@@ -85,10 +91,12 @@ export const useCustomers = () => {
         return response.json();
       })
       .then((customer) => {
-        setCustomers([...customer, customer]);
+        setCustomers([...customers, customer]);
+        handleEmptyForm();
+        handleGetCustomers();
         setStatus({
           show: true,
-          value: `Cliente ${customer.name} Registrado exitosamente!`,
+          value: `Cliente '${customer.customer}' Registrado exitosamente!`,
           notification: "insert",
           res: "ok",
         });
@@ -101,9 +109,6 @@ export const useCustomers = () => {
           res: "error",
         });
       });
-
-    handleEmptyForm();
-    handleGetCustomers();
   };
 
   const handleDeleteSelected = (rows: RowsData[]) => {
@@ -179,8 +184,8 @@ export const useCustomers = () => {
             fontSize: "1rem",
           }}
           onClick={(e) => {
-            navigator.clipboard.writeText(rowData.number);
-            setCopied({ success: true, value: rowData.number });
+            navigator.clipboard.writeText(rowData.customer);
+            setCopied({ success: true, value: rowData.customer });
             setTimeout(() => {
               setCopied({ success: false, value: "" });
             }, 3000);
@@ -188,17 +193,17 @@ export const useCustomers = () => {
           tabIndex={0}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
-              navigator.clipboard.writeText(rowData.number);
-              setCopied({ success: true, value: rowData.number });
+              navigator.clipboard.writeText(rowData.customer);
+              setCopied({ success: true, value: rowData.customer });
               setTimeout(() => {
                 setCopied({ success: false, value: "" });
               }, 3000);
             }
           }}
         >
-          {rowData.number}
+          {rowData.customer}
         </button>
-        {copied.success && copied.value === rowData.number && (
+        {copied.success && copied.value === rowData.customer && (
           <Tag
             value="Copiado!"
             severity="success"
