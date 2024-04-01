@@ -22,6 +22,7 @@
       "@/auth/*": ["./src/app/(auth)/*"],
       "@/phones/*": ["./src/app/phones/*"],
       "@/customers/*": ["./src/app/customers/*"],
+      "@/profiles/*": ["./src/app/profiles/*"],
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
