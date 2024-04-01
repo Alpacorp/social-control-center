@@ -1,9 +1,9 @@
 "use client";
 
-import { Customers } from "@/customers/container/Customers";
+import { Profiles } from "@/profiles/container/Profiles";
 
-const customersPage = () => {
-  return <Customers />;
+const profilesPage = () => {
+  return <Profiles />;
 };
 
-export default customersPage;
+export default profilesPage;

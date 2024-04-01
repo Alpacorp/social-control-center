@@ -3,45 +3,44 @@ import { useCallback, useEffect, useState } from "react";
 import { Tag } from "primereact/tag";
 import {
   Copied,
-  Customer,
+  Profile,
   RowsData,
   Status,
-} from "@/customers/interfaces/customers";
+} from "@/profiles/interfaces/profiles";
 
-export const useCustomers = () => {
-  const [customers, setCustomers] = useState<Customer[]>([]);
-  const [customer, setCustomer] = useState("");
-  const [comment, setComment] = useState("");
-
-  console.log("customer", customer);
-  console.log("comment:", comment);
-
-  const [selectedCustomer, setSelectedCustomer] = useState(null);
+export const useProfiles = () => {
+  const [profiles, setProfiles] = useState<Profile[]>([]);
+  const [selectedProfile, setSelectedProfile] = useState(null);
   const [status, setStatus] = useState<Status>({
     show: false,
     value: "",
     notification: "",
     res: "ok",
   });
-
-  console.log("status", status);
-
   const [copied, setCopied] = useState<Copied>({
     success: false,
     value: "",
+  });
+  const [profile, setProfile] = useState({
+    profilename: "",
+    profilelastname: "",
+    gender: "",
+    profession: "",
+    birthdate: new Date().toISOString().split("T")[0],
+    city: "",
   });
 
   const allowEdit = (rowData: { name: string }) => {
     return rowData.name !== "Blue Band";
   };
 
-  const handleGetCustomers = async () => {
+  const handleGetProfiles = async () => {
     try {
-      const response = await fetch("/api/customers/");
+      const response = await fetch("/api/profiles/");
       const data = await response.json();
-      setCustomers(data.customers);
+      setProfiles(data.profiles);
     } catch (error) {
-      console.error("GET /api/customers/ failed:", error);
+      console.error("GET /api/profiles/ failed:", error);
     }
   };
 
@@ -50,12 +49,12 @@ export const useCustomers = () => {
     index: any;
   }): Promise<void> => {
     let { newData, index } = event;
-    let _customers = [...customers];
-    _customers[index] = newData;
-    setCustomers(_customers);
+    let _profiles = [...profiles];
+    _profiles[index] = newData;
+    setProfiles(_profiles);
 
     try {
-      const response = await fetch(`/api/customers/${newData._id}`, {
+      const response = await fetch(`/api/profiles/${newData._id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -63,40 +62,37 @@ export const useCustomers = () => {
         body: JSON.stringify(newData),
       });
       if (!response.ok) {
-        throw new Error("Failed to update the customer record");
+        throw new Error("Failed to update the profiles record");
       }
       await response.json();
     } catch (error) {
-      console.error("Failed to update the customer record:", error);
+      console.error("Failed to update the profiles record:", error);
     }
   };
 
-  const handleSubmitCustomer = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmitProfile = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    fetch("/api/customers/", {
+    fetch("/api/profiles/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        customer,
-        comment,
-      }),
+      body: JSON.stringify(profile),
     })
       .then((response) => {
         if (!response.ok) {
-          throw new Error("Failed to create the customer record");
+          throw new Error("Failed to create the profile record");
         }
         return response.json();
       })
-      .then((customer) => {
-        setCustomers([...customers, customer]);
+      .then((profile) => {
+        setProfiles([...profiles, profile]);
         handleEmptyForm();
-        handleGetCustomers();
+        handleGetProfiles();
         setStatus({
           show: true,
-          value: `Cliente '${customer.customer}' Registrado exitosamente!`,
+          value: `Perfil '${profile.profilename}' Registrado exitosamente!`,
           notification: "insert",
           res: "ok",
         });
@@ -117,7 +113,7 @@ export const useCustomers = () => {
     }
 
     const deletePromises = rows.map((row) =>
-      fetch(`/api/customers/${row._id}`, {
+      fetch(`/api/profiles/${row._id}`, {
         method: "DELETE",
       })
     );
@@ -126,22 +122,22 @@ export const useCustomers = () => {
       .then((responses) => {
         const allSuccessful = responses.every((response) => response.ok);
         if (!allSuccessful) {
-          throw new Error("Failed to delete some customer records");
+          throw new Error("Failed to delete some profile records");
         }
         return Promise.all(responses.map((response) => response.json()));
       })
-      .then((customers) => {
+      .then((profiles) => {
         alert(
-          `Eliminación exitosa de ${customers.length} ${
-            customers.length > 1 ? "registros" : "registro"
+          `Eliminación exitosa de ${profiles.length} ${
+            profiles.length > 1 ? "registros" : "registro"
           }!`
         );
-        setSelectedCustomer(null);
+        setSelectedProfile(null);
       })
       .catch((error) => {
         alert(`Eliminación fallida! Error: ${error.message}`);
       });
-    handleGetCustomers();
+    handleGetProfiles();
   };
 
   const showAlertDelete = (rows: RowsData[]) => {
@@ -161,8 +157,14 @@ export const useCustomers = () => {
   };
 
   const handleEmptyForm = () => {
-    setCustomer("" as any);
-    setComment("");
+    setProfile({
+      profilename: "",
+      profilelastname: "",
+      gender: "",
+      profession: "",
+      birthdate: "",
+      city: "",
+    });
   };
 
   const closestatus = useCallback(() => {
@@ -173,7 +175,7 @@ export const useCustomers = () => {
     }
   }, [status]);
 
-  const numberBodyTemplate = (rowData: RowsData) => {
+  const idBodyTemplate = (rowData: RowsData) => {
     return (
       <div>
         <button
@@ -184,8 +186,8 @@ export const useCustomers = () => {
             fontSize: "1rem",
           }}
           onClick={(e) => {
-            navigator.clipboard.writeText(rowData.customer);
-            setCopied({ success: true, value: rowData.customer });
+            navigator.clipboard.writeText(rowData._id);
+            setCopied({ success: true, value: rowData._id });
             setTimeout(() => {
               setCopied({ success: false, value: "" });
             }, 3000);
@@ -193,17 +195,58 @@ export const useCustomers = () => {
           tabIndex={0}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
-              navigator.clipboard.writeText(rowData.customer);
-              setCopied({ success: true, value: rowData.customer });
+              navigator.clipboard.writeText(rowData._id);
+              setCopied({ success: true, value: rowData._id });
               setTimeout(() => {
                 setCopied({ success: false, value: "" });
               }, 3000);
             }
           }}
         >
-          {rowData.customer}
+          {rowData._id}
         </button>
-        {copied.success && copied.value === rowData.customer && (
+        {copied.success && copied.value === rowData._id && (
+          <Tag
+            value="Copiado!"
+            severity="success"
+            style={{ marginLeft: "1rem", height: "1rem" }}
+          />
+        )}
+      </div>
+    );
+  };
+
+  const idOldBodyTemplate = (rowData: RowsData) => {
+    return (
+      <div>
+        <button
+          style={{
+            cursor: "pointer",
+            background: "none",
+            border: "none",
+            fontSize: "1rem",
+          }}
+          onClick={(e) => {
+            navigator.clipboard.writeText(rowData.idold);
+            setCopied({ success: true, value: rowData.idold });
+            setTimeout(() => {
+              setCopied({ success: false, value: "" });
+            }, 3000);
+          }}
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              navigator.clipboard.writeText(rowData.idold);
+              setCopied({ success: true, value: rowData.idold });
+              setTimeout(() => {
+                setCopied({ success: false, value: "" });
+              }, 3000);
+            }
+          }}
+        >
+          {rowData.idold}
+        </button>
+        {copied.success && copied.value === rowData.idold && (
           <Tag
             value="Copiado!"
             severity="success"
@@ -219,25 +262,24 @@ export const useCustomers = () => {
   }, [closestatus]);
 
   useEffect(() => {
-    handleGetCustomers();
+    handleGetProfiles();
   }, []);
 
   return {
     allowEdit,
     closestatus,
-    comment,
     handleDeleteSelected,
     handleEmptyForm,
-    handleGetCustomers,
-    handleSubmitCustomer,
-    numberBodyTemplate,
+    handleGetProfiles,
+    handleSubmitProfile,
+    idBodyTemplate,
+    idOldBodyTemplate,
     onRowEditComplete,
-    customer,
-    customers,
-    selectedCustomer,
-    setComment,
-    setCustomer,
-    setSelectedCustomer,
+    profile,
+    profiles,
+    selectedProfile,
+    setProfile,
+    setSelectedProfile,
     showAlertDelete,
     status,
   };
