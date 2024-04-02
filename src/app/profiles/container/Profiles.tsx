@@ -192,6 +192,7 @@ export const Profiles = () => {
         ></Column>
         <Column
           field="_id"
+          filter
           header="Id New"
           sortable
           sortField="_id"
@@ -201,6 +202,7 @@ export const Profiles = () => {
         ></Column>
         <Column
           field="idold"
+          filter
           header="ID Old"
           sortable
           style={{ width: "60%" }}
