@@ -146,6 +146,7 @@ export const Phones = () => {
           sortField="_id"
           showFilterOperator
           style={{ width: "20%" }}
+          filter
         ></Column>
         <Column
           editor={(options) => NumberEditor(options as any)}
