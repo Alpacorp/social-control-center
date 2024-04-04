@@ -23,6 +23,7 @@
       "@/phones/*": ["./src/app/phones/*"],
       "@/customers/*": ["./src/app/customers/*"],
       "@/profiles/*": ["./src/app/profiles/*"],
+      "@/actions/*": ["./src/app/actions/*"],
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
