@@ -6,6 +6,7 @@ export interface Action {
   urlmention: string;
   customer: string;
   typeaction: string;
+  createdAt: Date;
 }
 
 export interface RowsData {

@@ -21,6 +21,8 @@ export const Actions = () => {
     handleSubmitAction,
     idBodyTemplate,
     idOldBodyTemplate,
+    handleGetActionsById,
+    idNewBodyTemplate,
     onRowEditComplete,
     action,
     actions,
@@ -36,6 +38,22 @@ export const Actions = () => {
         marginTop: "2rem",
       }}
     >
+      <form onSubmit={() => handleGetActionsById(action.idprofile)}>
+        <div>
+          <span className="p-float-label">
+            <InputText
+              id="idprofile"
+              value={action.idprofile}
+              onChange={(e) =>
+                setAction((prev) => ({ ...prev, idprofile: e.target.value }))
+              }
+              required
+            />
+            <label htmlFor="idprofile">Id Perfil</label>
+          </span>
+        </div>
+        <Button label="Buscar" className="mt-4" />
+      </form>
       <form
         onSubmit={handleSubmitAction}
         style={{
@@ -45,41 +63,17 @@ export const Actions = () => {
           margin: "2rem 0 4rem 0",
         }}
       >
-        <div>
-          <span className="p-float-label">
-            <InputText
-              id="actionname"
-              value={action.profilename}
-              onChange={(e) =>
-                setAction((prev) => ({ ...prev, actionname: e.target.value }))
-              }
-              required
-            />
-            <label htmlFor="actionname">Nombres</label>
-          </span>
-        </div>
-        <span className="p-float-label">
-          <InputText
-            id="actionlastname"
-            value={action.profilelastname}
-            onChange={(e) =>
-              setAction((prev) => ({
-                ...prev,
-                actionlastname: e.target.value,
-              }))
-            }
-          />
-          <label htmlFor="actionlastname">Apellidos</label>
-        </span>
         <div className="card flex justify-content-center">
           <Dropdown
-            value={action.gender}
+            value={action.socialmedia}
             onChange={(e) =>
-              setAction((prev) => ({ ...prev, gender: e.target.value } as any))
+              setAction(
+                (prev) => ({ ...prev, socialmedia: e.target.value } as any)
+              )
             }
             options={genders}
-            optionLabel={action.gender ? "value" : "label"}
-            placeholder="Selecciona el género"
+            optionLabel={action.socialmedia ? "value" : "label"}
+            placeholder="Selecciona la red social"
             className="w-full md:w-14rem"
             required
             showClear
@@ -87,52 +81,51 @@ export const Actions = () => {
         </div>
         <span className="p-float-label">
           <InputText
-            id="profession"
-            value={action.profession}
+            id="urlmention"
+            value={action.urlmention}
             onChange={(e) =>
-              setAction((prev) => ({ ...prev, profession: e.target.value }))
+              setAction((prev) => ({ ...prev, urlmention: e.target.value }))
             }
           />
-          <label htmlFor="profession">Profesión</label>
+          <label htmlFor="profession">Url Mención:</label>
         </span>
         <div className="card flex justify-content-center">
           <Dropdown
-            value={action.city}
+            value={action.customer}
             onChange={(e) =>
               setAction((prev) => ({ ...prev, city: e.target.value } as any))
             }
             options={cities}
-            optionLabel={action.city ? "value" : "label"}
-            placeholder="Selecciona el departamento"
+            optionLabel={action.customer ? "value" : "label"}
+            placeholder="Selecciona la campaña:"
             className="w-full md:w-14rem"
             required
             showClear
           />
         </div>
-        <span className="p-float-label">
-          <Calendar
-            id="birthdate"
-            value={new Date(action.birthdate)}
+        <div className="card flex justify-content-center">
+          <Dropdown
+            value={action.typeaction}
             onChange={(e) =>
-              setAction((prev) => ({
-                ...prev,
-                birthdate: e.target.value as any,
-              }))
+              setAction((prev) => ({ ...prev, city: e.target.value } as any))
             }
+            options={cities}
+            optionLabel={action.typeaction ? "value" : "label"}
+            placeholder="Selecciona el tipo de acción:"
+            className="w-full md:w-14rem"
+            required
+            showClear
           />
-          <label htmlFor="birthdate">Fecha de Nacimiento</label>
-        </span>
+        </div>
         <Button
           label="Registrar"
           raised
           disabled={
-            !action.profilename ||
-            !action.profilelastname ||
-            !action ||
-            !action.gender ||
-            !action.profession ||
-            !action.city ||
-            !action.birthdate
+            !action.idprofile ||
+            !action.socialmedia ||
+            !action.urlmention ||
+            !action.customer ||
+            !action.typeaction
           }
           className="mt-4"
         />
@@ -206,7 +199,7 @@ export const Actions = () => {
           header="ID Perfil Nuevo"
           sortable
           style={{ width: "60%" }}
-          body={idOldBodyTemplate}
+          body={idNewBodyTemplate}
         ></Column>
         <Column
           field="idprofileold"

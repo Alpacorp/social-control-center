@@ -5,6 +5,9 @@ import { Copied, Action, RowsData, Status } from "@/actions/interfaces/actions";
 
 export const useActions = () => {
   const [actions, setActions] = useState<Action[]>([]);
+
+  console.log("actions", actions);
+
   const [selectedAction, setSelectedAction] = useState(null);
   const [status, setStatus] = useState<Status>({
     show: false,
@@ -17,26 +20,28 @@ export const useActions = () => {
     value: "",
   });
   const [action, setAction] = useState({
-    profilename: "",
-    profilelastname: "",
-    gender: "",
-    profession: "",
-    birthdate: new Date().toISOString().split("T")[0],
-    city: "",
+    idprofile: "",
+    socialmedia: "",
+    urlmention: "",
+    customer: "",
+    typeaction: "",
   });
 
   const allowEdit = (rowData: { name: string }) => {
     return rowData.name !== "Blue Band";
   };
 
-  const handleGetActions = async () => {
+  const handleGetActionsById = async (idprofile: string) => {
     try {
-      const response = await fetch("/api/actions/");
+      const url = `/api/actions/${idprofile}`;
+      console.log("URL:", url);
+
+      const response = await fetch(url);
       const data = await response.json();
-      console.log("data", data);
-      setActions(data.actions);
+      console.log("data actions filtered by id", data);
+      setActions(data);
     } catch (error) {
-      console.error("GET /api/actions/ failed:", error);
+      console.error("GET /api/actions failed:", error);
     }
   };
 
@@ -85,7 +90,7 @@ export const useActions = () => {
       .then((action) => {
         setActions([...actions, action]);
         handleEmptyForm();
-        handleGetActions();
+        handleGetActionsById(action.idprofile);
         setStatus({
           show: true,
           value: `Perfil '${action.profilename}' Registrado exitosamente!`,
@@ -133,7 +138,7 @@ export const useActions = () => {
       .catch((error) => {
         alert(`Eliminación fallida! Error: ${error.message}`);
       });
-    handleGetActions();
+    handleGetActionsById(action.idprofile);
   };
 
   const showAlertDelete = (rows: RowsData[]) => {
@@ -154,12 +159,11 @@ export const useActions = () => {
 
   const handleEmptyForm = () => {
     setAction({
-      profilename: "",
-      profilelastname: "",
-      gender: "",
-      profession: "",
-      birthdate: "",
-      city: "",
+      idprofile: "",
+      socialmedia: "",
+      urlmention: "",
+      customer: "",
+      typeaction: "",
     });
   };
 
@@ -202,6 +206,47 @@ export const useActions = () => {
           {rowData._id}
         </button>
         {copied.success && copied.value === rowData._id && (
+          <Tag
+            value="Copiado!"
+            severity="success"
+            style={{ marginLeft: "1rem", height: "1rem" }}
+          />
+        )}
+      </div>
+    );
+  };
+
+  const idNewBodyTemplate = (rowData: RowsData) => {
+    return (
+      <div>
+        <button
+          style={{
+            cursor: "pointer",
+            background: "none",
+            border: "none",
+            fontSize: "1rem",
+          }}
+          onClick={(e) => {
+            navigator.clipboard.writeText(rowData.idprofile);
+            setCopied({ success: true, value: rowData.idprofile });
+            setTimeout(() => {
+              setCopied({ success: false, value: "" });
+            }, 3000);
+          }}
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              navigator.clipboard.writeText(rowData.idprofile);
+              setCopied({ success: true, value: rowData.idprofile });
+              setTimeout(() => {
+                setCopied({ success: false, value: "" });
+              }, 3000);
+            }
+          }}
+        >
+          {rowData.idprofile}
+        </button>
+        {copied.success && copied.value === rowData.idprofile && (
           <Tag
             value="Copiado!"
             severity="success"
@@ -258,17 +303,20 @@ export const useActions = () => {
   }, [closestatus]);
 
   useEffect(() => {
-    handleGetActions();
-  }, []);
+    if (action.idprofile) {
+      handleGetActionsById(action.idprofile);
+    }
+  }, [action.idprofile]);
 
   return {
     allowEdit,
     closestatus,
     handleDeleteSelected,
+    handleGetActionsById,
     handleEmptyForm,
-    handleGetActions,
     handleSubmitAction,
     idBodyTemplate,
+    idNewBodyTemplate,
     idOldBodyTemplate,
     onRowEditComplete,
     action,

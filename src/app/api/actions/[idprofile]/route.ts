@@ -2,14 +2,36 @@ import Action from "@/models/actionModel";
 import { connectDB } from "@/utils/connect";
 import { NextResponse } from "next/server";
 
+export async function GET(
+  request: Request,
+  { params }: { params: { idprofile: string } }
+) {
+  console.log("params", params);
+
+  await connectDB();
+  try {
+    const action = await Action.find({ idprofile: params.idprofile });
+
+    console.log("action endpoint", action);
+
+    return NextResponse.json(action, { status: 200 });
+  } catch (error) {
+    console.error("Failed to fetch the action record:", error);
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
+
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { idprofile: string } }
 ) {
   await connectDB();
   try {
     const action = await Action.findByIdAndUpdate(
-      params.id,
+      params.idprofile,
       JSON.parse(await request.text()),
       {
         new: true,
@@ -27,12 +49,12 @@ export async function PATCH(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { idprofile: string } }
 ) {
   await connectDB();
 
   try {
-    const action = await Action.findByIdAndDelete(params.id);
+    const action = await Action.findByIdAndDelete(params.idprofile);
     return NextResponse.json(action, { status: 200 });
   } catch (error) {
     console.error("Failed to delete the action record:", error);
