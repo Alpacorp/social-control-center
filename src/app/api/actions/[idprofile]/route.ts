@@ -45,20 +45,20 @@ export async function PATCH(
   }
 }
 
-// export async function DELETE(
-//   request: Request,
-//   { params }: { params: { idprofile: string } }
-// ) {
-//   await connectDB();
+export async function DELETE(
+  request: Request,
+  { params }: { params: { idprofile: string } }
+) {
+  await connectDB();
 
-//   try {
-//     const action = await Action.findByIdAndDelete(params.idprofile);
-//     return NextResponse.json(action, { status: 200 });
-//   } catch (error) {
-//     console.error("Failed to delete the action record:", error);
-//     return NextResponse.json(
-//       { message: "Internal server error" },
-//       { status: 500 }
-//     );
-//   }
-// }
+  try {
+    const action = await Action.findByIdAndDelete(params.idprofile);
+    return NextResponse.json(action, { status: 200 });
+  } catch (error) {
+    console.error("Failed to delete the action record:", error);
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
