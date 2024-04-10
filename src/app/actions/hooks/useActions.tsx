@@ -159,7 +159,7 @@ export const useActions = () => {
 
   const handleEmptyForm = () => {
     setAction({
-      idprofile: "",
+      idprofile: action.idprofile,
       socialmedia: "",
       urlmention: "",
       customer: "",

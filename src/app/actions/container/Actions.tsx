@@ -14,6 +14,10 @@ import cities from "@/actions/data/cities.json";
 import { DataTable } from "primereact/datatable";
 import { useActions } from "@/actions/hooks/useActions";
 
+import socialmedia from "@/actions/data/socialmedia.json";
+import typeaction from "@/actions/data/typeaction.json";
+import { useEffect, useState } from "react";
+
 export const Actions = () => {
   const {
     allowEdit,
@@ -32,6 +36,22 @@ export const Actions = () => {
     status,
   } = useActions();
 
+  const [customers, setCustomers] = useState([] as any);
+
+  const handleGetCustomers = async () => {
+    try {
+      const response = await fetch("/api/customers/");
+      const data = await response.json();
+      setCustomers(data.customers);
+    } catch (error) {
+      console.error("GET /api/customers/ failed:", error);
+    }
+  };
+
+  useEffect(() => {
+    handleGetCustomers();
+  }, []);
+
   return (
     <section
       style={{
@@ -49,10 +69,9 @@ export const Actions = () => {
               }
               required
             />
-            <label htmlFor="idprofile">Id Perfil</label>
+            <label htmlFor="idprofile">Buscar Id Perfil</label>
           </span>
         </div>
-        <Button label="Buscar" className="mt-4" />
       </form>
       <form
         onSubmit={handleSubmitAction}
@@ -71,7 +90,7 @@ export const Actions = () => {
                 (prev) => ({ ...prev, socialmedia: e.target.value } as any)
               )
             }
-            options={genders}
+            options={socialmedia}
             optionLabel={action.socialmedia ? "value" : "label"}
             placeholder="Selecciona la red social"
             className="w-full md:w-14rem"
@@ -93,9 +112,14 @@ export const Actions = () => {
           <Dropdown
             value={action.customer}
             onChange={(e) =>
-              setAction((prev) => ({ ...prev, city: e.target.value } as any))
+              setAction(
+                (prev) => ({ ...prev, customer: e.target.value } as any)
+              )
             }
-            options={cities}
+            options={customers.map((customer: any) => ({
+              label: customer.customer,
+              value: customer.customer,
+            }))}
             optionLabel={action.customer ? "value" : "label"}
             placeholder="Selecciona la campaña:"
             className="w-full md:w-14rem"
@@ -107,9 +131,11 @@ export const Actions = () => {
           <Dropdown
             value={action.typeaction}
             onChange={(e) =>
-              setAction((prev) => ({ ...prev, city: e.target.value } as any))
+              setAction(
+                (prev) => ({ ...prev, typeaction: e.target.value } as any)
+              )
             }
-            options={cities}
+            options={typeaction}
             optionLabel={action.typeaction ? "value" : "label"}
             placeholder="Selecciona el tipo de acción:"
             className="w-full md:w-14rem"
@@ -160,7 +186,6 @@ export const Actions = () => {
           </>
         )}
       </div>
-
       <DataTable
         value={actions}
         tableStyle={{ minWidth: "50rem" }}
@@ -181,7 +206,6 @@ export const Actions = () => {
         <Column
           selectionMode="multiple"
           headerStyle={{ width: "10%" }}
-          exportable={false}
         ></Column>
         <Column
           field="_id"
@@ -210,7 +234,9 @@ export const Actions = () => {
           body={idOldBodyTemplate}
         ></Column>
         <Column
-          editor={(options) => TextEditor(options as any)}
+          editor={(options) =>
+            DropdownEditor(options as any, socialmedia as any)
+          }
           field="socialmedia"
           header="Red Social"
           sortable
@@ -221,17 +247,19 @@ export const Actions = () => {
           field="urlmention"
           header="Url Contenido o Mención"
           sortable
-          style={{ width: "20%" }}
+          style={{ width: "20%", maxWidth: "20rem" }}
         ></Column>
         <Column
-          editor={(options) => DropdownEditor(options as any, genders as any)}
+          editor={(options) => TextEditor(options as any)}
           field="customer"
           header="Cliente"
           sortable
           style={{ width: "20%" }}
         ></Column>
         <Column
-          editor={(options) => TextEditor(options as any)}
+          editor={(options) =>
+            DropdownEditor(options as any, typeaction as any)
+          }
           field="typeaction"
           header="Tipo de Acción"
           sortable

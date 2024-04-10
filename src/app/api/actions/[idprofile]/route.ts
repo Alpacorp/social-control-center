@@ -6,15 +6,13 @@ export async function GET(
   request: Request,
   { params }: { params: { idprofile: string } }
 ) {
-  console.log("params", params);
-
   await connectDB();
+
   try {
-    const action = await Action.find({ idprofile: params.idprofile });
+    const actions = await Action.find({ idprofile: params.idprofile });
+    actions.sort((a, b) => -1);
 
-    console.log("action endpoint", action);
-
-    return NextResponse.json(action, { status: 200 });
+    return NextResponse.json(actions, { status: 200 });
   } catch (error) {
     console.error("Failed to fetch the action record:", error);
     return NextResponse.json(
