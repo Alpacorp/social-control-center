@@ -247,11 +247,13 @@ export const Actions = () => {
           field="urlmention"
           header="Url Contenido o Mención"
           sortable
+          filter
           style={{ width: "20%", maxWidth: "20rem" }}
         ></Column>
         <Column
           editor={(options) => TextEditor(options as any)}
           field="customer"
+          filter
           header="Cliente"
           sortable
           style={{ width: "20%" }}
