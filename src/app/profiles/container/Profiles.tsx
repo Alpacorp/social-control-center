@@ -210,6 +210,7 @@ export const Profiles = () => {
         ></Column>
         <Column
           editor={(options) => TextEditor(options as any)}
+          filter
           field="profilename"
           header="Nombres"
           sortable
