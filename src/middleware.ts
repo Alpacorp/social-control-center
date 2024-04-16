@@ -27,5 +27,6 @@ export const config = {
     "/customers",
     "/profiles",
     "/actions",
+    "/accounts",
   ],
 };
