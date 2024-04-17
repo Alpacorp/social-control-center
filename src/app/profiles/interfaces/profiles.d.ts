@@ -11,7 +11,7 @@ export interface Profile {
 
 export interface RowsData {
   _id: string;
-  idold: string;
+  idprofileold: string;
   profilename: string;
   profilelastname: string;
   gender: string;

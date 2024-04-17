@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 export default async function middleware(request: NextRequest) {
-  const token = request.cookies.get("token")?.value || "";
+  const token = request.cookies.get("token")?.value ?? "";
 
   const response = await fetch(`${request.nextUrl.origin}/api/token/`, {
     method: "POST",

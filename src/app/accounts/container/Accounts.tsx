@@ -5,30 +5,49 @@ import { Tag } from "primereact/tag";
 
 import { TextEditor } from "@/app/shared/ui/components/TextEditor";
 
-import { useProfiles } from "@/profiles/hooks/useProfiles";
-import { Calendar } from "primereact/calendar";
 import { Dropdown } from "primereact/dropdown";
 import { DropdownEditor } from "@/app/shared/ui/components/DropdownEditor";
 
-import genders from "@/profiles/data/genders.json";
-import cities from "@/profiles/data/cities.json";
 import { DataTable } from "primereact/datatable";
 
-export const Profiles = () => {
+import socialmedia from "@/actions/data/socialmedia.json";
+import typeaction from "@/actions/data/typeaction.json";
+import { useEffect, useState } from "react";
+import { useAccounts } from "@/accounts/hooks/useAccounts";
+
+export const Accounts = () => {
   const {
     allowEdit,
     handleDeleteSelected,
-    handleSubmitProfile,
+    handleSubmitAccount,
     idBodyTemplate,
     idOldBodyTemplate,
+    handleGetAccountsById,
+    idNewBodyTemplate,
     onRowEditComplete,
-    profile,
-    profiles,
-    selectedProfile,
-    setProfile,
-    setSelectedProfile,
+    account,
+    accounts,
+    selectedAccount,
+    setAccount,
+    setSelectedAccount,
     status,
-  } = useProfiles();
+  } = useAccounts();
+
+  const [customers, setCustomers] = useState([] as any);
+
+  const handleGetCustomers = async () => {
+    try {
+      const response = await fetch("/api/accounts/");
+      const data = await response.json();
+      setCustomers(data.customers);
+    } catch (error) {
+      console.error("GET /api/customers/ failed:", error);
+    }
+  };
+
+  useEffect(() => {
+    handleGetCustomers();
+  }, []);
 
   return (
     <section
@@ -36,8 +55,23 @@ export const Profiles = () => {
         marginTop: "2rem",
       }}
     >
+      <form onSubmit={() => handleGetAccountsById(account.idprofile)}>
+        <div>
+          <span className="p-float-label">
+            <InputText
+              id="idprofile"
+              value={account.idprofile}
+              onChange={(e) =>
+                setAccount((prev) => ({ ...prev, idprofile: e.target.value }))
+              }
+              required
+            />
+            <label htmlFor="idprofile">Buscar Id Perfil</label>
+          </span>
+        </div>
+      </form>
       <form
-        onSubmit={handleSubmitProfile}
+        onSubmit={handleSubmitAccount}
         style={{
           display: "flex",
           flexWrap: "wrap",
@@ -45,41 +79,17 @@ export const Profiles = () => {
           margin: "2rem 0 4rem 0",
         }}
       >
-        <div>
-          <span className="p-float-label">
-            <InputText
-              id="profilename"
-              value={profile.profilename}
-              onChange={(e) =>
-                setProfile((prev) => ({ ...prev, profilename: e.target.value }))
-              }
-              required
-            />
-            <label htmlFor="profilename">Nombres</label>
-          </span>
-        </div>
-        <span className="p-float-label">
-          <InputText
-            id="profilelastname"
-            value={profile.profilelastname}
-            onChange={(e) =>
-              setProfile((prev) => ({
-                ...prev,
-                profilelastname: e.target.value,
-              }))
-            }
-          />
-          <label htmlFor="profilelastname">Apellidos</label>
-        </span>
-        <div className="card flex justify-content-center">
+        {/* <div className="card flex justify-content-center">
           <Dropdown
-            value={profile.gender}
+            value={account.socialmedia}
             onChange={(e) =>
-              setProfile((prev) => ({ ...prev, gender: e.target.value } as any))
+              setAccount(
+                (prev) => ({ ...prev, socialmedia: e.target.value } as any)
+              )
             }
-            options={genders}
-            optionLabel={profile.gender ? "value" : "label"}
-            placeholder="Selecciona el género"
+            options={socialmedia}
+            optionLabel={account.socialmedia ? "value" : "label"}
+            placeholder="Selecciona la red social"
             className="w-full md:w-14rem"
             required
             showClear
@@ -87,52 +97,60 @@ export const Profiles = () => {
         </div>
         <span className="p-float-label">
           <InputText
-            id="profession"
-            value={profile.profession}
+            id="urlmention"
+            value={account.urlmention}
             onChange={(e) =>
-              setProfile((prev) => ({ ...prev, profession: e.target.value }))
+              setAccount((prev) => ({ ...prev, urlmention: e.target.value }))
             }
           />
-          <label htmlFor="profession">Profesión</label>
+          <label htmlFor="profession">Url Mención:</label>
         </span>
         <div className="card flex justify-content-center">
           <Dropdown
-            value={profile.city}
+            value={account.customer}
             onChange={(e) =>
-              setProfile((prev) => ({ ...prev, city: e.target.value } as any))
+              setAccount(
+                (prev) => ({ ...prev, customer: e.target.value } as any)
+              )
             }
-            options={cities}
-            optionLabel={profile.city ? "value" : "label"}
-            placeholder="Selecciona el departamento"
+            options={customers.map((customer: any) => ({
+              label: customer.customer,
+              value: customer.customer,
+            }))}
+            optionLabel={account.customer ? "value" : "label"}
+            placeholder="Selecciona la campaña:"
             className="w-full md:w-14rem"
             required
             showClear
           />
         </div>
-        <span className="p-float-label">
-          <Calendar
-            id="birthdate"
-            value={new Date(profile.birthdate)}
+        <div className="card flex justify-content-center">
+          <Dropdown
+            value={account.typeaction}
             onChange={(e) =>
-              setProfile((prev) => ({
-                ...prev,
-                birthdate: e.target.value as any,
-              }))
+              setAccount(
+                (prev) => ({ ...prev, typeaction: e.target.value } as any)
+              )
             }
+            options={typeaction}
+            optionLabel={account.typeaction ? "value" : "label"}
+            placeholder="Selecciona el tipo de acción:"
+            className="w-full md:w-14rem"
+            required
+            showClear
           />
-          <label htmlFor="birthdate">Fecha de Nacimiento</label>
-        </span>
+        </div> */}
         <Button
           label="Registrar"
           raised
           disabled={
-            !profile.profilename ||
-            !profile.profilelastname ||
-            !profile ||
-            !profile.gender ||
-            !profile.profession ||
-            !profile.city ||
-            !profile.birthdate
+            !account.idprofile ||
+            !account.email ||
+            !account.typeaccount ||
+            !account.username ||
+            !account.passaccount ||
+            !account.status ||
+            !account.revision
           }
           className="mt-4"
         />
@@ -146,14 +164,14 @@ export const Profiles = () => {
         )}
       </form>
       <div style={{ height: "39px", marginBottom: "20px" }}>
-        {selectedProfile && selectedProfile[0] && (
+        {selectedAccount && selectedAccount[0] && (
           <>
             <Button
               label="Delete"
               icon="pi pi-trash"
               severity="danger"
-              onClick={() => handleDeleteSelected(selectedProfile as any)}
-              disabled={!selectedProfile}
+              onClick={() => handleDeleteSelected(selectedAccount as any)}
+              disabled={!selectedAccount}
             />
 
             {status.show && status.notification === "delete" && (
@@ -167,9 +185,8 @@ export const Profiles = () => {
           </>
         )}
       </div>
-
       <DataTable
-        value={profiles}
+        value={accounts}
         tableStyle={{ minWidth: "50rem" }}
         editMode="row"
         dataKey="_id"
@@ -181,19 +198,18 @@ export const Profiles = () => {
         showGridlines
         removableSort
         reorderableColumns
-        selection={selectedProfile}
+        selection={selectedAccount}
         selectionMode={"checkbox" as any}
-        onSelectionChange={(event: any) => setSelectedProfile(event.value)}
+        onSelectionChange={(event: any) => setSelectedAccount(event.value)}
       >
         <Column
           selectionMode="multiple"
           headerStyle={{ width: "10%" }}
-          exportable={false}
         ></Column>
         <Column
           field="_id"
           filter
-          header="Id New"
+          header="Id account"
           sortable
           sortField="_id"
           showFilterOperator
@@ -201,53 +217,52 @@ export const Profiles = () => {
           body={idBodyTemplate}
         ></Column>
         <Column
+          field="idprofile"
+          filter
+          header="ID Perfil Nuevo"
+          sortable
+          style={{ width: "60%" }}
+          body={idNewBodyTemplate}
+        ></Column>
+        <Column
           field="idprofileold"
           filter
-          header="ID Old"
+          header="ID Perfil Antiguo"
           sortable
           style={{ width: "60%" }}
           body={idOldBodyTemplate}
         ></Column>
         <Column
+          editor={(options) =>
+            DropdownEditor(options as any, socialmedia as any)
+          }
+          field="socialmedia"
+          header="Red Social"
+          sortable
+          style={{ width: "20%" }}
+        ></Column>
+        <Column
           editor={(options) => TextEditor(options as any)}
+          field="urlmention"
+          header="Url Contenido o Mención"
+          sortable
           filter
-          field="profilename"
-          header="Nombres"
-          sortable
-          style={{ width: "20%" }}
+          style={{ width: "20%", maxWidth: "20rem" }}
         ></Column>
         <Column
           editor={(options) => TextEditor(options as any)}
-          field="profilelastname"
-          header="Apellidos"
+          field="customer"
+          filter
+          header="Cliente"
           sortable
           style={{ width: "20%" }}
         ></Column>
         <Column
-          editor={(options) => DropdownEditor(options as any, genders as any)}
-          field="gender"
-          header="Género"
-          sortable
-          style={{ width: "20%" }}
-        ></Column>
-        <Column
-          editor={(options) => TextEditor(options as any)}
-          field="profession"
-          header="Profesión"
-          sortable
-          style={{ width: "20%" }}
-        ></Column>
-        <Column
-          editor={(options) => TextEditor(options as any)}
-          field="birthdate"
-          header="Fecha de Nacimiento"
-          sortable
-          style={{ width: "10%" }}
-        ></Column>
-        <Column
-          editor={(options) => DropdownEditor(options as any, cities as any)}
-          field="city"
-          header="Ciudad"
+          editor={(options) =>
+            DropdownEditor(options as any, typeaction as any)
+          }
+          field="typeaction"
+          header="Tipo de Acción"
           sortable
           style={{ width: "20%" }}
         ></Column>

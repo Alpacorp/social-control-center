@@ -2,15 +2,18 @@ import { useCallback, useEffect, useState } from "react";
 
 import { Tag } from "primereact/tag";
 import {
+  Account,
   Copied,
-  Profile,
   RowsData,
   Status,
-} from "@/profiles/interfaces/profiles";
+} from "@/accounts/interfaces/accounts";
 
-export const useProfiles = () => {
-  const [profiles, setProfiles] = useState<Profile[]>([]);
-  const [selectedProfile, setSelectedProfile] = useState(null);
+export const useAccounts = () => {
+  const [accounts, setAccounts] = useState<Account[]>([]);
+
+  console.log("accounts", accounts);
+
+  const [selectedAccount, setSelectedAccount] = useState(null);
   const [status, setStatus] = useState<Status>({
     show: false,
     value: "",
@@ -21,26 +24,33 @@ export const useProfiles = () => {
     success: false,
     value: "",
   });
-  const [profile, setProfile] = useState({
-    profilename: "",
-    profilelastname: "",
-    gender: "",
-    profession: "",
-    birthdate: new Date().toISOString().split("T")[0],
-    city: "",
+  const [account, setAccount] = useState({
+    idprofile: "",
+    email: "",
+    typeaccount: "",
+    username: "",
+    passaccount: "",
+    status: "",
+    comments: "",
+    phone: "",
+    revision: "",
   });
 
   const allowEdit = (rowData: { name: string }) => {
     return rowData.name !== "Blue Band";
   };
 
-  const handleGetProfiles = async () => {
+  const handleGetAccountsById = async (idprofile: string) => {
     try {
-      const response = await fetch("/api/profiles/");
+      const url = `/api/accounts/${idprofile}`;
+      console.log("URL:", url);
+
+      const response = await fetch(url);
       const data = await response.json();
-      setProfiles(data.profiles);
+      console.log("data accounts filtered by id", data);
+      setAccounts(data);
     } catch (error) {
-      console.error("GET /api/profiles/ failed:", error);
+      console.error("GET /api/accounts failed:", error);
     }
   };
 
@@ -49,12 +59,12 @@ export const useProfiles = () => {
     index: any;
   }): Promise<void> => {
     let { newData, index } = event;
-    let _profiles = [...profiles];
-    _profiles[index] = newData;
-    setProfiles(_profiles);
+    let _actions = [...accounts];
+    _actions[index] = newData;
+    setAccounts(_actions);
 
     try {
-      const response = await fetch(`/api/profiles/${newData._id}`, {
+      const response = await fetch(`/api/accounts/${newData._id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -62,37 +72,37 @@ export const useProfiles = () => {
         body: JSON.stringify(newData),
       });
       if (!response.ok) {
-        throw new Error("Failed to update the profiles record");
+        throw new Error("Failed to update the accounts record");
       }
       await response.json();
     } catch (error) {
-      console.error("Failed to update the profiles record:", error);
+      console.error("Failed to update the accounts record:", error);
     }
   };
 
-  const handleSubmitProfile = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmitAccount = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    fetch("/api/profiles/", {
+    fetch("/api/accounts/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(profile),
+      body: JSON.stringify(account),
     })
       .then((response) => {
         if (!response.ok) {
-          throw new Error("Failed to create the profile record");
+          throw new Error("Failed to create the account record");
         }
         return response.json();
       })
-      .then((profile) => {
-        setProfiles([...profiles, profile]);
+      .then((account) => {
+        setAccounts([...accounts, account]);
         handleEmptyForm();
-        handleGetProfiles();
+        handleGetAccountsById(account.idprofile);
         setStatus({
           show: true,
-          value: `Perfil '${profile.profilename}' Registrado exitosamente!`,
+          value: `Perfil '${account.profilename}' Registrado exitosamente!`,
           notification: "insert",
           res: "ok",
         });
@@ -113,7 +123,7 @@ export const useProfiles = () => {
     }
 
     const deletePromises = rows.map((row) =>
-      fetch(`/api/profiles/${row._id}`, {
+      fetch(`/api/accounts/${row._id}`, {
         method: "DELETE",
       })
     );
@@ -122,22 +132,22 @@ export const useProfiles = () => {
       .then((responses) => {
         const allSuccessful = responses.every((response) => response.ok);
         if (!allSuccessful) {
-          throw new Error("Failed to delete some profile records");
+          throw new Error("Failed to delete some accounts records");
         }
         return Promise.all(responses.map((response) => response.json()));
       })
-      .then((profiles) => {
+      .then((accounts) => {
         alert(
-          `Eliminación exitosa de ${profiles.length} ${
-            profiles.length > 1 ? "registros" : "registro"
+          `Eliminación exitosa de ${accounts.length} ${
+            accounts.length > 1 ? "registros" : "registro"
           }!`
         );
-        setSelectedProfile(null);
+        setSelectedAccount(null);
       })
       .catch((error) => {
         alert(`Eliminación fallida! Error: ${error.message}`);
       });
-    handleGetProfiles();
+    handleGetAccountsById(account.idprofile);
   };
 
   const showAlertDelete = (rows: RowsData[]) => {
@@ -157,13 +167,16 @@ export const useProfiles = () => {
   };
 
   const handleEmptyForm = () => {
-    setProfile({
-      profilename: "",
-      profilelastname: "",
-      gender: "",
-      profession: "",
-      birthdate: "",
-      city: "",
+    setAccount({
+      idprofile: account.idprofile,
+      email: "",
+      typeaccount: "",
+      username: "",
+      passaccount: "",
+      status: "",
+      comments: "",
+      phone: "",
+      revision: "",
     });
   };
 
@@ -206,6 +219,47 @@ export const useProfiles = () => {
           {rowData._id}
         </button>
         {copied.success && copied.value === rowData._id && (
+          <Tag
+            value="Copiado!"
+            severity="success"
+            style={{ marginLeft: "1rem", height: "1rem" }}
+          />
+        )}
+      </div>
+    );
+  };
+
+  const idNewBodyTemplate = (rowData: RowsData) => {
+    return (
+      <div>
+        <button
+          style={{
+            cursor: "pointer",
+            background: "none",
+            border: "none",
+            fontSize: "1rem",
+          }}
+          onClick={(e) => {
+            navigator.clipboard.writeText(rowData.idprofile);
+            setCopied({ success: true, value: rowData.idprofile });
+            setTimeout(() => {
+              setCopied({ success: false, value: "" });
+            }, 3000);
+          }}
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              navigator.clipboard.writeText(rowData.idprofile);
+              setCopied({ success: true, value: rowData.idprofile });
+              setTimeout(() => {
+                setCopied({ success: false, value: "" });
+              }, 3000);
+            }
+          }}
+        >
+          {rowData.idprofile}
+        </button>
+        {copied.success && copied.value === rowData.idprofile && (
           <Tag
             value="Copiado!"
             severity="success"
@@ -262,24 +316,27 @@ export const useProfiles = () => {
   }, [closestatus]);
 
   useEffect(() => {
-    handleGetProfiles();
-  }, []);
+    if (account.idprofile) {
+      handleGetAccountsById(account.idprofile);
+    }
+  }, [account.idprofile]);
 
   return {
     allowEdit,
     closestatus,
     handleDeleteSelected,
+    handleGetAccountsById,
     handleEmptyForm,
-    handleGetProfiles,
-    handleSubmitProfile,
+    handleSubmitAccount,
     idBodyTemplate,
+    idNewBodyTemplate,
     idOldBodyTemplate,
     onRowEditComplete,
-    profile,
-    profiles,
-    selectedProfile,
-    setProfile,
-    setSelectedProfile,
+    account,
+    accounts,
+    selectedAccount,
+    setAccount,
+    setSelectedAccount,
     showAlertDelete,
     status,
   };
