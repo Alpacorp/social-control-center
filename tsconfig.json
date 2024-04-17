@@ -24,6 +24,7 @@
       "@/customers/*": ["./src/app/customers/*"],
       "@/profiles/*": ["./src/app/profiles/*"],
       "@/actions/*": ["./src/app/actions/*"],
+      "@/accounts/*": ["./src/app/accounts/*"],
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

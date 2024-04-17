@@ -5,12 +5,9 @@ import { Tag } from "primereact/tag";
 
 import { TextEditor } from "@/app/shared/ui/components/TextEditor";
 
-import { Calendar } from "primereact/calendar";
 import { Dropdown } from "primereact/dropdown";
 import { DropdownEditor } from "@/app/shared/ui/components/DropdownEditor";
 
-import genders from "@/actions/data/genders.json";
-import cities from "@/actions/data/cities.json";
 import { DataTable } from "primereact/datatable";
 import { useActions } from "@/actions/hooks/useActions";
 
