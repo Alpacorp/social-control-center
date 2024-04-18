@@ -12,6 +12,7 @@ import { TextEditor } from "@/app/shared/ui/components/TextEditor";
 import { usePhones } from "@/phones/hooks/usePhones";
 
 import operators from "@/phones/data/operators.json";
+import { useCheckRoleUser } from "@/app/shared/hooks/useCheckRoleUser/useCheckRoleUser";
 
 export const Phones = () => {
   const {
@@ -31,6 +32,8 @@ export const Phones = () => {
     handleChangeOperator,
     status,
   } = usePhones();
+
+  const [isAdmin] = useCheckRoleUser();
 
   return (
     <section
@@ -131,14 +134,16 @@ export const Phones = () => {
         removableSort
         reorderableColumns
         selection={selectedPhone}
-        selectionMode={"checkbox" as any}
+        selectionMode={isAdmin && ("checkbox" as any)}
         onSelectionChange={(event: any) => setSelectedPhone(event.value)}
       >
-        <Column
-          selectionMode="multiple"
-          headerStyle={{ width: "10%" }}
-          exportable={false}
-        ></Column>
+        {isAdmin && (
+          <Column
+            selectionMode="multiple"
+            headerStyle={{ width: "10%" }}
+            exportable={false}
+          ></Column>
+        )}
         <Column
           field="_id"
           header="Identificador"
