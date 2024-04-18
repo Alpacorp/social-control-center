@@ -12,6 +12,12 @@ const userSchema = new mongoose.Schema(
       required: [true, "Email is required"],
       unique: [true, "Email is already taken"],
     },
+    role: {
+      type: String,
+      required: [true, "Role is required"],
+      default: "user",
+      enum: ["user", "admin"],
+    },
     password: {
       type: String,
       required: [true, "Password is required"],

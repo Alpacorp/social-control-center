@@ -56,7 +56,7 @@ export const Phones = () => {
               useGrouping={false}
               required
             />
-            <label htmlFor="number-input">Number</label>
+            <label htmlFor="number-input">Número Telefónico:</label>
           </span>
         </div>
         <div className="card flex justify-content-center">
