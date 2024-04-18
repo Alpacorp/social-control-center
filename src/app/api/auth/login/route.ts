@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
   try {
     const user = await User.findOne({ email });
 
-    console.log("user", user);
+    console.log("user:", user);
 
     if (!user) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
@@ -33,7 +33,13 @@ export async function POST(req: NextRequest) {
     }
 
     const token = jwt.sign(
-      { email, password, userName: user.username },
+      {
+        email,
+        password,
+        username: user.username,
+        role: user.role,
+        id: user._id,
+      },
       jwtSecret,
       {
         expiresIn: "2h",

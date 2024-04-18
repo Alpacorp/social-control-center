@@ -25,6 +25,14 @@ export const SignUpSection = () => {
           />
         </div>
         <div>
+          <label htmlFor="role">Role</label>
+          <input
+            type="text"
+            id="role"
+            onChange={(event) => handleInput(event)}
+          />
+        </div>
+        <div>
           <label htmlFor="password">Password</label>
           <input
             type="password"

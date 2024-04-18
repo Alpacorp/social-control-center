@@ -32,7 +32,7 @@ export const useAccounts = () => {
     passaccount: "",
     status: "",
     comments: "",
-    phone: "",
+    phone: null,
     revision: "",
   });
 
@@ -175,7 +175,7 @@ export const useAccounts = () => {
       passaccount: "",
       status: "",
       comments: "",
-      phone: "",
+      phone: null,
       revision: "",
     });
   };

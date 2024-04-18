@@ -1,7 +1,12 @@
 import { useState } from "react";
 
 export const useSignUp = () => {
-  const [info, setInfo] = useState({ username: "", email: "", password: "" });
+  const [info, setInfo] = useState({
+    username: "",
+    email: "",
+    role: "",
+    password: "",
+  });
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -13,7 +18,12 @@ export const useSignUp = () => {
     event.preventDefault();
     console.log("info received", info);
 
-    if (info.username === "" || info.email === "" || info.password === "") {
+    if (
+      info.username === "" ||
+      info.email === "" ||
+      info.role === "" ||
+      info.password === ""
+    ) {
       setMessage("All fields are required");
       return;
     }

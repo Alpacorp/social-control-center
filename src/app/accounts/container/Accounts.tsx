@@ -10,10 +10,13 @@ import { DropdownEditor } from "@/app/shared/ui/components/DropdownEditor";
 
 import { DataTable } from "primereact/datatable";
 
-import socialmedia from "@/actions/data/socialmedia.json";
-import typeaction from "@/actions/data/typeaction.json";
+import socialmedia from "@/accounts/data/socialmedia.json";
+import statusAccount from "@/accounts/data/statusAccount.json";
+import revisionAccount from "@/accounts/data/revisionAccount.json";
+
 import { useEffect, useState } from "react";
 import { useAccounts } from "@/accounts/hooks/useAccounts";
+import { InputNumber } from "primereact/inputnumber";
 
 export const Accounts = () => {
   const {
@@ -79,17 +82,91 @@ export const Accounts = () => {
           margin: "2rem 0 4rem 0",
         }}
       >
-        {/* <div className="card flex justify-content-center">
+        <span className="p-float-label">
+          <InputText
+            id="email"
+            value={account.email}
+            onChange={(e) =>
+              setAccount((prev) => ({ ...prev, email: e.target.value }))
+            }
+          />
+          <label htmlFor="email">Correo Electrónico:</label>
+        </span>
+        <div className="card flex justify-content-center">
           <Dropdown
-            value={account.socialmedia}
+            value={account.typeaccount}
             onChange={(e) =>
               setAccount(
-                (prev) => ({ ...prev, socialmedia: e.target.value } as any)
+                (prev) => ({ ...prev, typeaccount: e.target.value } as any)
               )
             }
             options={socialmedia}
-            optionLabel={account.socialmedia ? "value" : "label"}
-            placeholder="Selecciona la red social"
+            optionLabel={account.typeaccount ? "value" : "label"}
+            placeholder="Selecciona el tipo de cuenta:"
+            className="w-full md:w-14rem"
+            required
+            showClear
+          />
+        </div>
+        <div>
+          <span className="p-float-label">
+            <InputNumber
+              id="number-input"
+              value={account.phone}
+              onValueChange={(e) =>
+                setAccount((prev) => ({ ...prev, phone: e.value } as any))
+              }
+              useGrouping={false}
+              required
+            />
+            <label htmlFor="number-input">Número Telefónico:</label>
+          </span>
+        </div>
+        <span className="p-float-label">
+          <InputText
+            id="username"
+            value={account.username}
+            onChange={(e) =>
+              setAccount((prev) => ({ ...prev, username: e.target.value }))
+            }
+          />
+          <label htmlFor="username">Nombre Usuario:</label>
+        </span>
+        <span className="p-float-label">
+          <InputText
+            id="passaccount"
+            value={account.passaccount}
+            onChange={(e) =>
+              setAccount((prev) => ({ ...prev, passaccount: e.target.value }))
+            }
+          />
+          <label htmlFor="passaccount">Contraseña:</label>
+        </span>
+        <div className="card flex justify-content-center">
+          <Dropdown
+            value={account.status}
+            onChange={(e) =>
+              setAccount((prev) => ({ ...prev, status: e.target.value } as any))
+            }
+            options={statusAccount}
+            optionLabel={account.status ? "value" : "label"}
+            placeholder="Selecciona el estado:"
+            className="w-full md:w-14rem"
+            required
+            showClear
+          />
+        </div>
+        <div className="card flex justify-content-center">
+          <Dropdown
+            value={account.revision}
+            onChange={(e) =>
+              setAccount(
+                (prev) => ({ ...prev, revision: e.target.value } as any)
+              )
+            }
+            options={revisionAccount}
+            optionLabel={account.revision ? "value" : "label"}
+            placeholder="Revisión:"
             className="w-full md:w-14rem"
             required
             showClear
@@ -97,49 +174,14 @@ export const Accounts = () => {
         </div>
         <span className="p-float-label">
           <InputText
-            id="urlmention"
-            value={account.urlmention}
+            id="comments"
+            value={account.comments}
             onChange={(e) =>
-              setAccount((prev) => ({ ...prev, urlmention: e.target.value }))
+              setAccount((prev) => ({ ...prev, comments: e.target.value }))
             }
           />
-          <label htmlFor="profession">Url Mención:</label>
+          <label htmlFor="comments">Comentarios adicionales:</label>
         </span>
-        <div className="card flex justify-content-center">
-          <Dropdown
-            value={account.customer}
-            onChange={(e) =>
-              setAccount(
-                (prev) => ({ ...prev, customer: e.target.value } as any)
-              )
-            }
-            options={customers.map((customer: any) => ({
-              label: customer.customer,
-              value: customer.customer,
-            }))}
-            optionLabel={account.customer ? "value" : "label"}
-            placeholder="Selecciona la campaña:"
-            className="w-full md:w-14rem"
-            required
-            showClear
-          />
-        </div>
-        <div className="card flex justify-content-center">
-          <Dropdown
-            value={account.typeaction}
-            onChange={(e) =>
-              setAccount(
-                (prev) => ({ ...prev, typeaction: e.target.value } as any)
-              )
-            }
-            options={typeaction}
-            optionLabel={account.typeaction ? "value" : "label"}
-            placeholder="Selecciona el tipo de acción:"
-            className="w-full md:w-14rem"
-            required
-            showClear
-          />
-        </div> */}
         <Button
           label="Registrar"
           raised
@@ -233,48 +275,65 @@ export const Accounts = () => {
           body={idOldBodyTemplate}
         ></Column>
         <Column
-          editor={(options) =>
-            DropdownEditor(options as any, socialmedia as any)
-          }
-          field="socialmedia"
-          header="Red Social"
+          editor={(options) => TextEditor(options as any)}
+          field="email"
+          header="Correo Electrónico"
           sortable
           style={{ width: "20%" }}
         ></Column>
         <Column
-          editor={(options) => TextEditor(options as any)}
-          field="urlmention"
-          header="Url Contenido o Mención"
+          editor={(options) =>
+            DropdownEditor(options as any, socialmedia as any)
+          }
+          field="typeaccount"
+          header="Red Social"
           sortable
           filter
           style={{ width: "20%", maxWidth: "20rem" }}
         ></Column>
         <Column
           editor={(options) => TextEditor(options as any)}
-          field="customer"
+          field="username"
           filter
-          header="Cliente"
+          header="Usuario"
+          sortable
+          style={{ width: "20%" }}
+        ></Column>
+        <Column
+          editor={(options) => TextEditor(options as any)}
+          field="passaccount"
+          header="Contraseña"
+          sortable
+          style={{ width: "20%" }}
+        ></Column>
+        <Column
+          field="phone"
+          header="Número Telefónico"
           sortable
           style={{ width: "20%" }}
         ></Column>
         <Column
           editor={(options) =>
-            DropdownEditor(options as any, typeaction as any)
+            DropdownEditor(options as any, statusAccount as any)
           }
-          field="typeaction"
-          header="Tipo de Acción"
+          field="status"
+          header="Estado Cuenta"
           sortable
           style={{ width: "20%" }}
         ></Column>
         <Column
-          field="updatedAt"
-          header="Última actualización"
+          editor={(options) =>
+            DropdownEditor(options as any, revisionAccount as any)
+          }
+          field="revision"
+          header="Revisión"
           sortable
           style={{ width: "20%" }}
         ></Column>
         <Column
-          field="createdAt"
-          header="Fecha registro"
+          editor={(options) => TextEditor(options as any)}
+          field="comments"
+          header="Anotaciones"
           sortable
           style={{ width: "20%" }}
         ></Column>

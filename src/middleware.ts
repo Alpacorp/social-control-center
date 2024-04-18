@@ -11,6 +11,8 @@ export default async function middleware(request: NextRequest) {
 
   const result = await response.json();
 
+  console.log("middleware result", result);
+
   if (!result.valid) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
