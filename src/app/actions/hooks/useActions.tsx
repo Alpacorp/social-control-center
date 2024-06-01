@@ -93,7 +93,7 @@ export const useActions = () => {
         handleGetActionsById(action.idprofile);
         setStatus({
           show: true,
-          value: `Perfil '${action.profilename}' Registrado exitosamente!`,
+          value: `Acción '${action._id}' Registrada exitosamente!`,
           notification: "insert",
           res: "ok",
         });

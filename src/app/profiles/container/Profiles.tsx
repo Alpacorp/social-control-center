@@ -13,6 +13,7 @@ import { DropdownEditor } from "@/app/shared/ui/components/DropdownEditor";
 import genders from "@/profiles/data/genders.json";
 import cities from "@/profiles/data/cities.json";
 import { DataTable } from "primereact/datatable";
+import { useCheckRoleUser } from "@/app/shared/hooks/useCheckRoleUser/useCheckRoleUser";
 
 export const Profiles = () => {
   const {
@@ -29,6 +30,8 @@ export const Profiles = () => {
     setSelectedProfile,
     status,
   } = useProfiles();
+
+  const [isAdmin] = useCheckRoleUser();
 
   return (
     <section
@@ -182,14 +185,16 @@ export const Profiles = () => {
         removableSort
         reorderableColumns
         selection={selectedProfile}
-        selectionMode={"checkbox" as any}
+        selectionMode={isAdmin && ("checkbox" as any)}
         onSelectionChange={(event: any) => setSelectedProfile(event.value)}
       >
-        <Column
-          selectionMode="multiple"
-          headerStyle={{ width: "10%" }}
-          exportable={false}
-        ></Column>
+        {isAdmin && (
+          <Column
+            selectionMode="multiple"
+            headerStyle={{ width: "10%" }}
+            exportable={false}
+          ></Column>
+        )}
         <Column
           field="_id"
           filter
