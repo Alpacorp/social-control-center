@@ -102,7 +102,7 @@ export const useAccounts = () => {
         handleGetAccountsById(account.idprofile);
         setStatus({
           show: true,
-          value: `Perfil '${account.profilename}' Registrado exitosamente!`,
+          value: `Perfil '${account.username}' Registrado exitosamente!`,
           notification: "insert",
           res: "ok",
         });

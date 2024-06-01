@@ -10,6 +10,9 @@ import {
 
 export const useProfiles = () => {
   const [profiles, setProfiles] = useState<Profile[]>([]);
+
+  console.log("profiles", profiles);
+
   const [selectedProfile, setSelectedProfile] = useState(null);
   const [status, setStatus] = useState<Status>({
     show: false,

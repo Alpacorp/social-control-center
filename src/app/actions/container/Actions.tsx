@@ -14,6 +14,7 @@ import { useActions } from "@/actions/hooks/useActions";
 import socialmedia from "@/actions/data/socialmedia.json";
 import typeaction from "@/actions/data/typeaction.json";
 import { useEffect, useState } from "react";
+import { useCheckRoleUser } from "@/app/shared/hooks/useCheckRoleUser/useCheckRoleUser";
 
 export const Actions = () => {
   const {
@@ -32,6 +33,8 @@ export const Actions = () => {
     setSelectedAction,
     status,
   } = useActions();
+
+  const [isAdmin] = useCheckRoleUser();
 
   const [customers, setCustomers] = useState([] as any);
 
@@ -197,13 +200,15 @@ export const Actions = () => {
         removableSort
         reorderableColumns
         selection={selectedAction}
-        selectionMode={"checkbox" as any}
+        selectionMode={isAdmin && ("checkbox" as any)}
         onSelectionChange={(event: any) => setSelectedAction(event.value)}
       >
-        <Column
-          selectionMode="multiple"
-          headerStyle={{ width: "10%" }}
-        ></Column>
+        {isAdmin && (
+          <Column
+            selectionMode="multiple"
+            headerStyle={{ width: "10%" }}
+          ></Column>
+        )}
         <Column
           field="_id"
           filter

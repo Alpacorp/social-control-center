@@ -17,6 +17,7 @@ import revisionAccount from "@/accounts/data/revisionAccount.json";
 import { useEffect, useState } from "react";
 import { useAccounts } from "@/accounts/hooks/useAccounts";
 import { InputNumber } from "primereact/inputnumber";
+import { useCheckRoleUser } from "@/app/shared/hooks/useCheckRoleUser/useCheckRoleUser";
 
 export const Accounts = () => {
   const {
@@ -35,6 +36,8 @@ export const Accounts = () => {
     setSelectedAccount,
     status,
   } = useAccounts();
+
+  const [isAdmin] = useCheckRoleUser();
 
   const [customers, setCustomers] = useState([] as any);
 
@@ -244,10 +247,12 @@ export const Accounts = () => {
         selectionMode={"checkbox" as any}
         onSelectionChange={(event: any) => setSelectedAccount(event.value)}
       >
-        <Column
-          selectionMode="multiple"
-          headerStyle={{ width: "10%" }}
-        ></Column>
+        {isAdmin && (
+          <Column
+            selectionMode="multiple"
+            headerStyle={{ width: "10%" }}
+          ></Column>
+        )}
         <Column
           field="_id"
           filter
